@@ -1,0 +1,13 @@
+/*
+ *
+ */
+
+aa-namespace-yaml(parent, vars) ::= <<
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: anrisoftware-com
+  labels:
+    group: anrisoftware-com
+
+>>
