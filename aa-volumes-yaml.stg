@@ -12,8 +12,6 @@ metadata:
   name: anrisoftware-com-data
   namespace: anrisoftware-com
   labels:
-    app: mariadb
-    tier: backend
     group: anrisoftware-com
 spec:
   accessModes:
@@ -27,11 +25,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: anrisoftware-com-repo
+  name: anrisoftware-com-gitolite
   namespace: anrisoftware-com
   labels:
-    app: repo
-    tier: backend
     group: anrisoftware-com
 spec:
   accessModes:

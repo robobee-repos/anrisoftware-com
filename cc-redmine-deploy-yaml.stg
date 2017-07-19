@@ -107,15 +107,16 @@ spec:
           name: anrisoftware-com-data
           subPath: html
         - mountPath: /repo
-          name: anrisoftware-com-repo
+          name: anrisoftware-com-gitolite
+          subPath: repo
       restartPolicy: Always
       volumes:
       - name: anrisoftware-com-data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-      - name: anrisoftware-com-repo
+      - name: anrisoftware-com-gitolite
         persistentVolumeClaim:
-          claimName: anrisoftware-com-repo
+          claimName: anrisoftware-com-gitolite
 <affinitiesGroup(parent, vars)>
 <tolerationsGroup(parent, vars)>
 
