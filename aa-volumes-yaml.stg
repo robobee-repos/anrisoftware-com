@@ -17,5 +17,5 @@ spec:
   - ReadWriteMany
   resources:
     requests:
-      storage: <vars.anrisoftware.volume.storage>
+      storage: <vars.git.volume.storage>
 >>
