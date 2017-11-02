@@ -1,14 +1,14 @@
 /*
  * Mandatory:
  *
- * vars.anrisoftware.volume.storage
+ * vars.git.volume.storage
  *
  */
 aa-volumes-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: anrisoftware-com-data
+  name: anrisoftware-com-git
   namespace: anrisoftware-com
   labels:
     group: anrisoftware-com

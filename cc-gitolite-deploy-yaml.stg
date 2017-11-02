@@ -111,13 +111,13 @@ spec:
           timeoutSeconds: 10
         volumeMounts:
         - mountPath: /home/git
-          name: data
+          name: git
           subPath: git
       restartPolicy: Always
       volumes:
-      - name: data
+      - name: git
         persistentVolumeClaim:
-          claimName: anrisoftware-com-data
+          claimName: anrisoftware-com-git
 <affinitiesGroup(parent, vars, vars.gitolite.affinityRequired)>
 <tolerationMaster(parent, vars, vars.gitolite.allowOnMaster)>
 <tolerationsGroup(parent, vars, vars.gitolite.tolerations, vars.gitolite.allowOnMaster)>
