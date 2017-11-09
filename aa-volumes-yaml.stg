@@ -1,15 +1,14 @@
 /*
+ * Mandatory:
+ *
+ * vars.git.volume.storage
  *
  */
-
 aa-volumes-yaml(parent, vars) ::= <<
-
----
-
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: anrisoftware-com-data
+  name: anrisoftware-com-git
   namespace: anrisoftware-com
   labels:
     group: anrisoftware-com
@@ -18,24 +17,5 @@ spec:
   - ReadWriteMany
   resources:
     requests:
-      storage: 1Gi
-
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: anrisoftware-com-gitolite
-  namespace: anrisoftware-com
-  labels:
-    group: anrisoftware-com
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 10Gi
-
----
-
+      storage: <vars.git.volume.storage>
 >>

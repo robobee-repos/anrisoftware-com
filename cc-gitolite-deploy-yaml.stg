@@ -7,13 +7,34 @@
  * vars.gitolite.limits.memory
  * vars.gitolite.requests.cpu
  * vars.gitolite.requests.memory
- * vars.gitolite.clientMaxBodySize
+ * vars.gitolite.ssh.key
+ * 
+ * Optional:
+ * 
+ * vars.gitolite.affinityRequired
+ * vars.gitolite.allowOnMaster
+ * vars.gitolite.tolerations
  */
 
 import "affinities.stg"
 import "tolerations.stg"
 
 cc-gitolite-deploy-yaml(parent, vars) ::= <<
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitolite
+  labels:
+    app: gitolite
+    tier: backend
+    group: anrisoftware-com
+  namespace: anrisoftware-com
+type: Opaque
+data:
+  ssh_key: <vars.gitolite.ssh.key;format="base64">
+
 
 ---
 
@@ -24,7 +45,7 @@ metadata:
   namespace: anrisoftware-com
   labels:
     app: gitolite
-    tier: frontend
+    tier: backend
     group: anrisoftware-com
 spec:
   ports:
@@ -47,14 +68,14 @@ metadata:
   namespace: anrisoftware-com
   labels:
     app: gitolite
-    tier: frontend
+    tier: backend
     group: anrisoftware-com
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: gitolite
-      tier: frontend
+      tier: backend
       group: anrisoftware-com
   strategy:
     type: Recreate
@@ -62,12 +83,20 @@ spec:
     metadata:
       labels:
         app: gitolite
-        tier: frontend
+        tier: backend
         group: anrisoftware-com
     spec:
       containers:
       - image: <vars.gitolite.image.name>:<vars.gitolite.image.version>
         name: gitolite
+        env:
+        - name: DEBUG
+          value: "true"
+        - name: SSH_KEY
+          valueFrom:
+            secretKeyRef:
+              name: gitolite
+              key: ssh_key
         ports:
         - containerPort: 2222
           name: "ssh"
@@ -81,24 +110,21 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 2222
-          initialDelaySeconds: 60
+          initialDelaySeconds: 10
           periodSeconds: 60
           timeoutSeconds: 10
         volumeMounts:
-        - mountPath: /home/git/repositories
-          name: anrisoftware-com-gitolite
-          subPath: repo
-        volumeMounts:
-        - mountPath: /ssh-in
-          name: anrisoftware-com-gitolite
-          subPath: ssh
+        - mountPath: /home/git
+          name: git
+          subPath: git
       restartPolicy: Always
       volumes:
-      - name: anrisoftware-com-gitolite
+      - name: git
         persistentVolumeClaim:
-          claimName: anrisoftware-com-gitolite
-<affinitiesGroup(parent, vars)>
-<tolerationsGroup(parent, vars)>
+          claimName: anrisoftware-com-git
+<affinitiesGroup(parent, vars, vars.gitolite.affinityRequired)>
+<tolerationMaster(parent, vars, vars.gitolite.allowOnMaster)>
+<tolerationsGroup(parent, vars, vars.gitolite.tolerations, vars.gitolite.allowOnMaster)>
 
 ---
 
