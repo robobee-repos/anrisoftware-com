@@ -52,8 +52,25 @@ spec:
   - name: "ssh"
     port: 2222
     targetPort: 2222
-  - port: 2222
-    name: ssh
+  selector:
+    app: gitolite
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitolite-public
+  namespace: anrisoftware-com
+  labels:
+    app: gitolite
+    tier: backend
+    group: anrisoftware-com
+spec:
+  type: NodePort
+  ports:
+  - name: "ssh"
+    port: 2222
     targetPort: 2222
     nodePort: 30022
   selector:
