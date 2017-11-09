@@ -31,6 +31,10 @@ spec:
   - name: "ssh"
     port: 2222
     targetPort: 2222
+  - port: 2222
+    name: ssh
+    targetPort: 2222
+    nodePort: 30022
   selector:
     app: gitolite
 
