@@ -10,10 +10,10 @@
  * 
  * Optional:
  * 
- * vars.db.affinityRequired
- * vars.db.tolerations[].key
- * vars.db.tolerations[].effect
- * vars.db.tolerations[].value
+ * vars.redminedb.affinityRequired
+ * vars.redminedb.tolerations[].key
+ * vars.redminedb.tolerations[].effect
+ * vars.redminedb.tolerations[].value
  */
 import "affinities.stg"
 import "tolerations.stg"
