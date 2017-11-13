@@ -73,7 +73,7 @@ spec:
     spec:
       containers:
       - image: <vars.gitlabceapp.image.name>:<vars.gitlabceapp.image.version>
-        name: gitlabce-app
+        name: gitlabce
         env:
         - name: GITLAB_OMNIBUS_CONFIG
           valueFrom:
