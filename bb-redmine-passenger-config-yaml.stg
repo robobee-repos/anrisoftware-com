@@ -1,0 +1,97 @@
+/*
+ * Mandatory:
+ *
+ * vars.redmineapp.nginx.workerProcesses
+ * vars.redmineapp.nginx.workerConnections
+ * vars.redmineapp.nginx.clientMaxBodySize
+ * vars.redmineapp.nginx.hosts[]
+ */
+bb-redmine-passenger-config-yaml(parent, vars) ::= <<
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redmine-passenger
+  namespace: anrisoftware-com
+  labels:
+    app: redmine
+    tier: frontend
+    group: anrisoftware-com
+data:
+  nginx.conf.erb: |
+    \<%= include_passenger_internal_template('global.erb') %>
+    worker_processes <vars.redmineapp.nginx.workerProcesses>;
+    events {
+        worker_connections <vars.redmineapp.nginx.workerConnections>;
+    }
+    http {
+        \<%= include_passenger_internal_template('http.erb', 4) %>
+        sendfile on;
+        default_type application/octet-stream;
+        types_hash_max_size 2048;
+        server_names_hash_bucket_size 64;
+        client_max_body_size <vars.redmineapp.nginx.clientMaxBodySize>;
+        access_log off;
+        keepalive_timeout 60;
+        underscores_in_headers on;
+        gzip on;
+        gzip_comp_level 3;
+        gzip_min_length 150;
+        gzip_proxied any;
+        gzip_types text/plain text/css text/json text/javascript
+            application/javascript application/x-javascript application/json
+            application/rss+xml application/vnd.ms-fontobject application/x-font-ttf
+            application/xml font/opentype image/svg+xml text/xml;
+
+        <% if @app_finder.multi_mode? %>
+            # Default server entry for mass deployment mode.
+            server {
+                \<%= include_passenger_internal_template('mass_deployment_default_server.erb', 12) %>
+            }
+        <% end %>
+
+        <% for app in @apps %>
+<rest(vars.redmineapp.nginx.hosts):redirectHost(parent, vars);separator="\n">
+        server {
+            \<%= include_passenger_internal_template('server.erb', 8, true, binding) %>
+            \<%= include_passenger_internal_template('rails_asset_pipeline.erb', 8, false) %>
+            server_name <first(vars.redmineapp.nginx.hosts)>;
+            #
+            location = /favicon.ico {
+              log_not_found off;
+              access_log off;
+            }
+            #
+            location = /robots.txt {
+              allow all;
+              log_not_found off;
+              access_log off;
+            }
+            #
+            location ~ /\. {
+              deny all;
+            }
+            #
+            location ~* /(?:uploads|nginx_server_appends)/.*\.rb$ {
+              deny all;
+            }
+            #
+            location ~* \.(js|css|png|jpg|jpeg|gif|ico|html|htm)$ {
+              expires max;
+              log_not_found off;
+            }
+        }
+        passenger_pre_start \<%= listen_url(app) %>;
+        <% end %>
+
+        \<%= include_passenger_internal_template('footer.erb', 4) %>
+    }
+
+>>
+
+redirectHost(host, parent, vars) ::= <<
+        server {
+            root /var/www/html;
+            server_name <host>;
+            return 301 https://<first(vars.redmineapp.nginx.hosts)>$request_uri;
+        }
+>>

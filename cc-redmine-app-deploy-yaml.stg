@@ -117,8 +117,8 @@ spec:
           subPath: redmine_bundle
         - mountPath: /redmine-in
           name: config
-        livenessProbe:
-          tcpSocket:
+        - mountPath: /passenger-in
+          name: passenger
         readinessProbe:
           httpGet:
             path: /
@@ -133,6 +133,9 @@ spec:
       - name: config
         configMap:
           name: redmine-app
+      - name: passenger
+        configMap:
+          name: redmine-passenger
 <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
 <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
 <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
