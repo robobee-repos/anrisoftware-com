@@ -77,17 +77,17 @@ spec:
           valueFrom:
             secretKeyRef:
               name: redmine-db
-              key: redminedb_db
+              key: redmine_db
         - name: REDMINE_DB_USER
           valueFrom:
             secretKeyRef:
               name: redmine-db
-              key: redminedb_user
+              key: redmine_user
         - name: REDMINE_DB_PASSWORD
           valueFrom:
             secretKeyRef:
               name: redmine-db
-              key: redminedb_password
+              key: redmine_password
         - name: REDMINE_DB_MYSQL
           value: "mariadb"
         - name: NGINX_WORKER_PROCESSES
