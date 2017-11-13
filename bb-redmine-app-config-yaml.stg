@@ -6,11 +6,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: redmine-app
-  namespace: interscalar-com
+  namespace: anrisoftware-com
   labels:
-    app: nginx
+    app: redmine
     tier: frontend
-    group: interscalar-com
+    group: anrisoftware-com
 data:
   additional_environment.rb: |
     config.log_level = :warn
