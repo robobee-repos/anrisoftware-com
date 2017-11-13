@@ -110,7 +110,7 @@ spec:
           periodSeconds: 60
           timeoutSeconds: 10
       restartPolicy: Always
-      - image: <vars.nginx.image.name>:<vars.nginx.image.version>
+      - image: <vars.gitlabceapp.nginx.image.name>:<vars.gitlabceapp.nginx.image.version>
         name: nginx
         ports:
         - containerPort: 8080
@@ -129,11 +129,11 @@ spec:
           periodSeconds: 60
         resources:
           limits:
-            cpu: <vars.nginx.limits.cpu>
-            memory: <vars.nginx.limits.memory>
+            cpu: <vars.gitlabceapp.nginx.limits.cpu>
+            memory: <vars.gitlabceapp.nginx.limits.memory>
           requests:
-            cpu: <vars.nginx.requests.cpu>
-            memory: <vars.nginx.requests.memory>
+            cpu: <vars.gitlabceapp.nginx.requests.cpu>
+            memory: <vars.gitlabceapp.nginx.requests.memory>
         volumeMounts:
         - mountPath: "/var/opt/gitlab"
           name: data
