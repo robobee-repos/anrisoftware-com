@@ -1,0 +1,24 @@
+/*
+* Mandatory:
+*
+* vars.gitlabceapp.nginx.hosts[]
+*/
+bb-gitlabce-app-config-yaml(parent, vars) ::= <<
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitlabce-app
+  namespace: anrisoftware-com
+  labels:
+    app: gitlabce
+    tier: frontend
+    group: anrisoftware-com
+data:
+  gitlab_omnibus_config: |
+    external_url 'https://<first(vars.gitlabceapp.nginx.hosts)>'
+    gitlab_rails['gitlab_shell_ssh_port'] = 4444
+    nginx['enable'] = false
+    gitlab_workhorse['listen_network'] = "tcp"
+    gitlab_workhorse['listen_addr'] = "0.0.0.0:8181"
+
+>>

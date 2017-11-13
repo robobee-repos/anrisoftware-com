@@ -1,0 +1,160 @@
+/*
+ * Mandatory:
+ *
+ * vars.gitlabceapp.image.name
+ * vars.gitlabceapp.image.version
+ * vars.gitlabceapp.limits.cpu
+ * vars.gitlabceapp.limits.memory
+ * vars.gitlabceapp.requests.cpu
+ * vars.gitlabceapp.requests.memory
+ * 
+ * Optional:
+ * 
+ * vars.gitlabceapp.affinityRequired
+ * vars.gitlabceapp.tolerations[].key
+ * vars.gitlabceapp.tolerations[].effect
+ * vars.gitlabceapp.tolerations[].value
+ */
+
+import "affinities.stg"
+import "tolerations.stg"
+
+/*
+ *
+ */
+cc-gitlabce-app-deploy-yaml(parent, vars) ::= <<
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlabce-app
+  namespace: anrisoftware-com
+  labels:
+    app: gitlab-ce
+    tier: frontend
+    group: anrisoftware-com
+spec:
+  ports:
+  - name: "http"
+    port: 8080
+    targetPort: 8080
+  - name: "ssh"
+    port: 4444
+    targetPort: 4444
+  selector:
+    app: gitlab-ce
+
+---
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: gitlabce-app
+  namespace: anrisoftware-com
+  labels:
+    app: gitlab-ce
+    tier: frontend
+    group: anrisoftware-com
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab-ce
+      tier: frontend
+      group: anrisoftware-com
+  template:
+    metadata:
+      labels:
+        app: gitlab-ce
+        tier: frontend
+        group: anrisoftware-com
+    spec:
+      containers:
+      - image: <vars.gitlabceapp.image.name>:<vars.gitlabceapp.image.version>
+        name: gitlabce-app
+        env:
+        - name: GITLAB_OMNIBUS_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              name: gitlabce-app
+              key: gitlab_omnibus_config
+        ports:
+        - containerPort: 4444
+          name: "ssh"
+        resources:
+          limits:
+            cpu: <vars.gitlabceapp.limits.cpu>
+            memory: <vars.gitlabceapp.limits.memory>
+          requests:
+            cpu: <vars.gitlabceapp.requests.cpu>
+            memory: <vars.gitlabceapp.requests.memory>
+        volumeMounts:
+        - mountPath: "/etc/gitlab"
+          name: data
+          subPath: gitlab_ce_etc
+        - mountPath: "/var/log/gitlab"
+          name: data
+          subPath: gitlab_ce_log
+        - mountPath: "/var/opt/gitlab"
+          name: data
+          subPath: gitlab_ce_var
+        - mountPath: "/opt/gitlab/embedded/service/gitlab-rails/public"
+          name: data
+          subPath: gitlab_ce_public
+        readinessProbe:
+          tcpSocket:
+            port: 8181
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 10
+      restartPolicy: Always
+      - image: <vars.nginx.image.name>:<vars.nginx.image.version>
+        name: nginx
+        ports:
+        - containerPort: 8080
+          name: "http"
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 60
+        resources:
+          limits:
+            cpu: <vars.nginx.limits.cpu>
+            memory: <vars.nginx.limits.memory>
+          requests:
+            cpu: <vars.nginx.requests.cpu>
+            memory: <vars.nginx.requests.memory>
+        volumeMounts:
+        - mountPath: "/var/opt/gitlab"
+          name: data
+          subPath: gitlab_ce_var
+        - mountPath: "/opt/gitlab/embedded/service/gitlab-rails/public"
+          name: data
+          subPath: gitlab_ce_public
+        - mountPath: /nginx-in
+          name: nginx-config
+      restartPolicy: Always
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: anrisoftware-com-data
+      - name: nginx-config
+        configMap:
+          name: gitlabce-nginx
+<affinitiesGroup(parent, vars, vars.gitlabceapp.affinityRequired)>
+<tolerationMaster(parent, vars, vars.gitlabceapp.allowOnMaster)>
+<tolerations(parent, vars, vars.gitlabceapp.tolerations, vars.gitlabceapp.allowOnMaster)>
+
+---
+
+>>
