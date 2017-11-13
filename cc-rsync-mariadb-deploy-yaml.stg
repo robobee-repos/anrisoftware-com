@@ -76,17 +76,17 @@ spec:
             cpu: <vars.rsync.requests.cpu>
             memory: <vars.rsync.requests.memory>
         volumeMounts:
-        - mountPath: /data
-          name: db
+        - mountPath: "/data"
+          name: data
           subPath: mariadb
-        - mountPath: /mariadb_logs
-          name: db
+        - mountPath: "/mariadb_logs"
+          name: data
           subPath: mariadb_logs
       restartPolicy: Always
       volumes:
-      - name: db
+      - name: data
         persistentVolumeClaim:
-          claimName: anrisoftware-com
+          claimName: anrisoftware-com-data
 <affinitiesGroup(parent, vars, vars.db.affinityRequired)>
 <tolerationMaster(parent, vars, vars.db.allowOnMaster)>
 <tolerations(parent, vars, vars.db.tolerations, vars.db.allowOnMaster)>
