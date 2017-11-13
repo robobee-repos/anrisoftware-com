@@ -8,7 +8,7 @@ aa-volumes-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: anrisoftware-com-git
+  name: anrisoftware-com
   namespace: anrisoftware-com
   labels:
     group: anrisoftware-com
