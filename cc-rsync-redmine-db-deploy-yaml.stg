@@ -21,11 +21,11 @@ import "tolerations.stg"
 /*
  *
  */
-cc-rsync-redminedb-deploy-yaml(parent, vars) ::= <<
+cc-rsync-redmine-db-deploy-yaml(parent, vars) ::= <<
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: rsync-redminedb
+  name: rsync-redmine-db
   namespace: anrisoftware-com
   labels:
     app: rsync
@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
       - image: <vars.rsync.image.name>:<vars.rsync.image.version>
-        name: rsync-redminedb
+        name: rsync-redmine-db
         env:
         - name: RSYNC_AUTHORIZED_KEY
           valueFrom:
