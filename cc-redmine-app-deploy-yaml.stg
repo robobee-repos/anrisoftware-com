@@ -126,9 +126,9 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-      - name: redmine-app-secret
-        configMap:
-          name: secret
+      - name: secret
+        secret:
+          secretName: redmine-app-secret
 <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
 <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
 <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
