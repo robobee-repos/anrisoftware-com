@@ -42,14 +42,14 @@ data:
             application/rss+xml application/vnd.ms-fontobject application/x-font-ttf
             application/xml font/opentype image/svg+xml text/xml;
 
-        <% if @app_finder.multi_mode? %>
+        \<% if @app_finder.multi_mode? %>
             # Default server entry for mass deployment mode.
             server {
                 \<%= include_passenger_internal_template('mass_deployment_default_server.erb', 12) %>
             }
-        <% end %>
+        \<% end %>
 
-        <% for app in @apps %>
+        \<% for app in @apps %>
 <rest(vars.redmineapp.nginx.hosts):redirectHost(parent, vars);separator="\n">
         server {
             \<%= include_passenger_internal_template('server.erb', 8, true, binding) %>
@@ -81,7 +81,7 @@ data:
             }
         }
         passenger_pre_start \<%= listen_url(app) %>;
-        <% end %>
+        \<% end %>
 
         \<%= include_passenger_internal_template('footer.erb', 4) %>
     }
