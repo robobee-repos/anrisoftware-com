@@ -1,6 +1,7 @@
 /*
  * Mandatory:
  *
+ * vars.redmineapp.nginx.startTimeout
  * vars.redmineapp.nginx.workerProcesses
  * vars.redmineapp.nginx.workerConnections
  * vars.redmineapp.nginx.clientMaxBodySize
@@ -25,6 +26,7 @@ data:
     }
     http {
         \<%= include_passenger_internal_template('http.erb', 4) %>
+        passenger_start_timeout <vars.redmineapp.nginx.startTimeout>;
         sendfile on;
         default_type application/octet-stream;
         types_hash_max_size 2048;
