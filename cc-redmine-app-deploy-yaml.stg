@@ -114,7 +114,7 @@ spec:
           name: data
           subPath: redmine_bundle
         - mountPath: /redmine-in
-          name: secret
+          name: config
         livenessProbe:
           tcpSocket:
             port: 3000
@@ -126,9 +126,9 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-      - name: secret
-        secret:
-          secretName: redmine-app-secret
+      - name: config
+        configMap:
+          name: redmine-app
 <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
 <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
 <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>

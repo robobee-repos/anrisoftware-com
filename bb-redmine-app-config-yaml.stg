@@ -1,15 +1,11 @@
 /*
- * Mandatory:
  *
- * vars.redminedb.redmine.db
- * vars.redminedb.redmine.user
- * vars.redminedb.redmine.password
  */
 bb-redmine-app-config-yaml(parent, vars) ::= <<
 apiVersion: v1
-kind: Secret
+kind: Config
 metadata:
-  name: redmine-app-secret
+  name: redmine-app
   namespace: interscalar-com
   labels:
     app: nginx
@@ -17,15 +13,6 @@ metadata:
     group: interscalar-com
 type: Opaque
 data:
-  database.yaml: |
-    production:
-      adapter: "mysql2"
-      host: "mariadb"
-      port: "3306"
-      username: "<vars.redminedb.redmine.user;format="base64">"
-      password: "<vars.redminedb.redmine.password;format="base64">"
-      database: "<vars.redminedb.redmine.db;format="base64">"
-      
   additional_environment.rb: |
     config.log_level = :warn
 
