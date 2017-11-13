@@ -119,10 +119,12 @@ spec:
           name: config
         livenessProbe:
           tcpSocket:
+        readinessProbe:
+          httpGet:
+            path: /
             port: 3000
-          initialDelaySeconds: 300
+          initialDelaySeconds: 60
           periodSeconds: 60
-          timeoutSeconds: 10
       restartPolicy: Always
       volumes:
       - name: data
