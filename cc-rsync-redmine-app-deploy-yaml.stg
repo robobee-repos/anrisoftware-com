@@ -22,7 +22,7 @@ import "tolerations.stg"
  *
  */
 cc-rsync-redmine-app-deploy-yaml(parent, vars) ::= <<
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: rsync-redmine-app
