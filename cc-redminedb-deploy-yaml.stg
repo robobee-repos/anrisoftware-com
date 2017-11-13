@@ -1,17 +1,17 @@
 /*
  * Mandatory:
  *
- * vars.db.limits.cpu
- * vars.db.limits.memory
- * vars.db.requests.cpu
- * vars.db.requests.memory
+ * vars.redminedb.limits.cpu
+ * vars.redminedb.limits.memory
+ * vars.redminedb.requests.cpu
+ * vars.redminedb.requests.memory
  * 
  * Optional:
  * 
- * vars.db.affinityRequired
- * vars.db.tolerations[].key
- * vars.db.tolerations[].effect
- * vars.db.tolerations[].value
+ * vars.redminedb.affinityRequired
+ * vars.redminedb.tolerations[].key
+ * vars.redminedb.tolerations[].effect
+ * vars.redminedb.tolerations[].value
  */
 
 import "maradns_probe.stg"
@@ -21,14 +21,14 @@ import "tolerations.stg"
 /*
  *
  */
-cc-db-deploy-yaml(parent, vars) ::= <<
+cc-redminedb-deploy-yaml(parent, vars) ::= <<
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: db
+  name: redminedb
   namespace: anrisoftware-com
   labels:
     app: mariadb
@@ -76,54 +76,54 @@ spec:
         - name: MARIADB_ROOT_USER
           valueFrom:
             secretKeyRef:
-              name: db
+              name: redminedb
               key: root_user
         - name: MARIADB_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: db
+              name: redminedb
               key: root_password
         - name: MARIADB_DATABASE
           valueFrom:
             secretKeyRef:
-              name: db
+              name: redminedb
               key: redmine_db
         - name: MARIADB_USER
           valueFrom:
             secretKeyRef:
-              name: db
+              name: redminedb
               key: redmine_user
         - name: MARIADB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: db
+              name: redminedb
               key: redmine_password
         ports:
         - containerPort: 3306
           name: "mysql"
         resources:
           limits:
-            cpu: <vars.db.limits.cpu>
-            memory: <vars.db.limits.memory>
+            cpu: <vars.redminedb.limits.cpu>
+            memory: <vars.redminedb.limits.memory>
           requests:
-            cpu: <vars.db.requests.cpu>
-            memory: <vars.db.requests.memory>
+            cpu: <vars.redminedb.requests.cpu>
+            memory: <vars.redminedb.requests.memory>
         volumeMounts:
-        - mountPath: /bitnami/mariadb
-          name: db
-          subPath: mariadb
-        - mountPath: /opt/bitnami/mariadb/logs
-          name: db
-          subPath: mariadb_logs
+        - mountPath: "/bitnami/mariadb"
+          name: data
+          subPath: redminedb
+        - mountPath: "/opt/bitnami/mariadb/logs"
+          name: data
+          subPath: redminedb_logs
 <readinessProbe(parent, vars)>
       restartPolicy: Always
       volumes:
-      - name: db
+      - name: data
         persistentVolumeClaim:
-          claimName: anrisoftware-com
-<affinitiesGroup(parent, vars, vars.db.affinityRequired)>
-<tolerationMaster(parent, vars, vars.db.allowOnMaster)>
-<tolerations(parent, vars, vars.db.tolerations, vars.db.allowOnMaster)>
+          claimName: anrisoftware-com-data
+<affinitiesGroup(parent, vars, vars.redminedb.affinityRequired)>
+<tolerationMaster(parent, vars, vars.redminedb.allowOnMaster)>
+<tolerations(parent, vars, vars.redminedb.tolerations, vars.redminedb.allowOnMaster)>
 
 ---
 
