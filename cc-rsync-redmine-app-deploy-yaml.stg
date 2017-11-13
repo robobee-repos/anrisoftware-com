@@ -1,0 +1,94 @@
+/*
+ * Mandatory:
+ *
+ * vars.rsync.image.name
+ * vars.rsync.image.version
+ * vars.rsync.limits.cpu
+ * vars.rsync.limits.memory
+ * vars.rsync.requests.cpu
+ * vars.rsync.requests.memory
+ * 
+ * Optional:
+ * 
+ * vars.redmineapp.affinityRequired
+ * vars.redmineapp.tolerations[].key
+ * vars.redmineapp.tolerations[].effect
+ * vars.redmineapp.tolerations[].value
+ */
+import "affinities.stg"
+import "tolerations.stg"
+
+/*
+ *
+ */
+cc-rsync-redmine-deploy-yaml(parent, vars) ::= <<
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: rsync-redmine
+  namespace: anrisoftware-com
+  labels:
+    app: rsync
+    tier: backup
+    group: anrisoftware-com
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: rsync
+      tier: backup
+      group: anrisoftware-com
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rsync
+        tier: backup
+        group: anrisoftware-com
+    spec:
+      containers:
+      - image: <vars.rsync.image.name>:<vars.rsync.image.version>
+        name: rsync-redmine
+        env:
+        - name: RSYNC_AUTHORIZED_KEY
+          valueFrom:
+            secretKeyRef:
+              name: rsync-ssh
+              key: auth-key
+        - name: USER
+          value: "root"
+        ports:
+        - containerPort: 2222
+          name: ssh
+        readinessProbe:
+          exec:
+            command:
+            - /readiness.sh
+            - /data/Rakefile
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: <vars.rsync.limits.cpu>
+            memory: <vars.rsync.limits.memory>
+          requests:
+            cpu: <vars.rsync.requests.cpu>
+            memory: <vars.rsync.requests.memory>
+        volumeMounts:
+        - mountPath: "/data"
+          name: data
+          subPath: redmine_html
+        - mountPath: "/bundle"
+          name: data
+          subPath: redmine_bundle
+      restartPolicy: Always
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: anrisoftware-com-data
+<affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
+<tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
+<tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
+
+>>

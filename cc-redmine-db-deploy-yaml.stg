@@ -21,14 +21,14 @@ import "tolerations.stg"
 /*
  *
  */
-cc-redminedb-deploy-yaml(parent, vars) ::= <<
+cc-redmine-db-deploy-yaml(parent, vars) ::= <<
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: redminedb
+  name: mariadb
   namespace: anrisoftware-com
   labels:
     app: mariadb
@@ -76,27 +76,27 @@ spec:
         - name: MARIADB_ROOT_USER
           valueFrom:
             secretKeyRef:
-              name: redminedb
+              name: redmine-db
               key: root_user
         - name: MARIADB_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: redminedb
+              name: redmine-db
               key: root_password
         - name: MARIADB_DATABASE
           valueFrom:
             secretKeyRef:
-              name: redminedb
+              name: redmine-db
               key: redmine_db
         - name: MARIADB_USER
           valueFrom:
             secretKeyRef:
-              name: redminedb
+              name: redmine-db
               key: redmine_user
         - name: MARIADB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: redminedb
+              name: redmine-db
               key: redmine_password
         ports:
         - containerPort: 3306
