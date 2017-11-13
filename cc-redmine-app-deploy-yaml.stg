@@ -1,6 +1,8 @@
 /*
  * Mandatory:
  *
+ * vars.redmineapp.image.name
+ * vars.redmineapp.image.version
  * vars.redmineapp.limits.cpu
  * vars.redmineapp.limits.memory
  * vars.redmineapp.requests.cpu
@@ -70,7 +72,7 @@ spec:
         group: anrisoftware-com
     spec:
       containers:
-      - image: bitnami/mariadb:latest
+      - image: <vars.redmineapp.image.name>:<vars.redmineapp.image.version>
         name: redmine-app
         env:
         - name: REDMINE_DB_DATABASE
