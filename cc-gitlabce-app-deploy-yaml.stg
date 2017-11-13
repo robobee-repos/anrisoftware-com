@@ -109,7 +109,6 @@ spec:
           initialDelaySeconds: 60
           periodSeconds: 60
           timeoutSeconds: 10
-      restartPolicy: Always
       - image: <vars.gitlabceapp.nginx.image.name>:<vars.gitlabceapp.nginx.image.version>
         name: nginx
         ports:
