@@ -21,21 +21,21 @@ import "tolerations.stg"
 /*
  *
  */
-cc-rsync-mariadb-deploy-yaml(parent, vars) ::= <<
+cc-rsync-redminedb-deploy-yaml(parent, vars) ::= <<
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: rsync-mariadb
+  name: rsync-redminedb
   namespace: anrisoftware-com
   labels:
-    app: rsync-mariadb
+    app: rsync-redminedb
     tier: backup
     group: anrisoftware-com
 spec:
   replicas: 0
   selector:
     matchLabels:
-      app: rsync-mariadb
+      app: rsync-redminedb
       tier: backup
       group: anrisoftware-com
   strategy:
@@ -43,13 +43,13 @@ spec:
   template:
     metadata:
       labels:
-        app: rsync-mariadb
+        app: rsync-redminedb
         tier: backup
         group: anrisoftware-com
     spec:
       containers:
       - image: <vars.rsync.image.name>:<vars.rsync.image.version>
-        name: rsync-mariadb
+        name: rsync-redminedb
         env:
         - name: RSYNC_AUTHORIZED_KEY
           valueFrom:
