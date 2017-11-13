@@ -77,26 +77,26 @@ spec:
         - name: REDMINE_DB_DATABASE
           valueFrom:
             secretKeyRef:
-              name: redminedb
+              name: redmine-db
               key: redminedb_db
         - name: REDMINE_DB_USER
           valueFrom:
             secretKeyRef:
-              name: redminedb
+              name: redmine-db
               key: redminedb_user
         - name: REDMINE_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: redminedb
+              name: redmine-db
               key: redminedb_password
         - name: REDMINE_DB_MYSQL
           value: "mariadb"
         - name: NGINX_WORKER_PROCESSES
-          value: <vars.redmineapp.nginx.workerProcesses>
+          value: "<vars.redmineapp.nginx.workerProcesses>"
         - name: NGINX_WORKER_CONNECTIONS
-          value: <vars.redmineapp.nginx.workerConnections>
+          value: "<vars.redmineapp.nginx.workerConnections>"
         - name: NGINX_CLIENT_MAX_BODY_SIZE
-          value: <vars.redmineapp.nginx.clientMaxBodySize>
+          value: "<vars.redmineapp.nginx.clientMaxBodySize>"
         ports:
         - containerPort: 3000
           name: "http"
