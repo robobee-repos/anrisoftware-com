@@ -7,7 +7,7 @@
  */
 bb-redmine-app-config-yaml(parent, vars) ::= <<
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
   name: redmine-app-secret
   namespace: interscalar-com
@@ -15,6 +15,7 @@ metadata:
     app: nginx
     tier: frontend
     group: interscalar-com
+type: Opaque
 data:
   database.yaml: |
     production:
