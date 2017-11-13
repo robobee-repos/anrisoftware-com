@@ -3,7 +3,7 @@
  */
 bb-redmine-app-config-yaml(parent, vars) ::= <<
 apiVersion: v1
-kind: Config
+kind: ConfigMap
 metadata:
   name: redmine-app
   namespace: interscalar-com
