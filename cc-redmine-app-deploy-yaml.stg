@@ -80,7 +80,7 @@ spec:
             secretKeyRef:
               name: redmine-db
               key: redmine_db
-        - name: REDMINE_DB_USER
+        - name: REDMINE_DB_USERNAME
           valueFrom:
             secretKeyRef:
               name: redmine-db
