@@ -5,11 +5,11 @@
  * vars.redmineapp.nginx.clientMaxBodySize
  *
  */
-xx-gitlabce-app-ingress-yaml(parent, vars) ::= <<
+xx-redmine-app-ingress-yaml(parent, vars) ::= <<
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: gitlabce-app
+  name: redmine-app
   namespace: anrisoftware-com
   labels:
     app: gitlab-ce
@@ -36,6 +36,6 @@ hostRule(host) ::= <<
       paths:
       - path: /
         backend:
-          serviceName: gitlabce-app
-          servicePort: 8888
+          serviceName: redmine-app
+          servicePort: 3000
 >>
