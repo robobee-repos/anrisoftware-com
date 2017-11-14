@@ -26,7 +26,7 @@ spec:
   tls:
   - hosts:
     <vars.redmineapp.nginx.hosts:{h|- <h>};separator="\n">
-    secretName: tls-secret
+    secretName: redmine-app-tls-secret
   rules:
 <vars.redmineapp.nginx.hosts:hostRule();separator="\n">
 

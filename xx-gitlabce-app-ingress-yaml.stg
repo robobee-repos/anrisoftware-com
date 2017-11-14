@@ -24,7 +24,7 @@ spec:
   tls:
   - hosts:
     <vars.gitlabceapp.nginx.hosts:{h|- <h>};separator="\n">
-    secretName: tls-secret
+    secretName: gitlabce-tls-secret
   rules:
 <vars.gitlabceapp.nginx.hosts:hostRule();separator="\n">
 
