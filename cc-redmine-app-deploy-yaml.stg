@@ -123,8 +123,9 @@ spec:
           httpGet:
             path: /
             port: 3000
-          initialDelaySeconds: 60
+          initialDelaySeconds: 300
           periodSeconds: 60
+          timeoutSeconds: 10
       restartPolicy: Always
       volumes:
       - name: data
