@@ -20,6 +20,7 @@ metadata:
     kubernetes.io/tls-acme: "true"
     ingress.kubernetes.io/proxy-body-size: "<vars.redmineapp.nginx.clientMaxBodySize>"
     ingress.kubernetes.io/affinity: "cookie"
+    ingress.kubernetes.io/ssl-redirect: "true"
     ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   tls:
