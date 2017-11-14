@@ -78,10 +78,10 @@ spec:
         volumeMounts:
         - mountPath: "/data"
           name: data
-          subPath: mariadb
+          subPath: redminedb
         - mountPath: "/mariadb_logs"
           name: data
-          subPath: mariadb_logs
+          subPath: redminedb_logs
       restartPolicy: Always
       volumes:
       - name: data
