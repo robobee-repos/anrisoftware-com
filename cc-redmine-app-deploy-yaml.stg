@@ -35,7 +35,7 @@ metadata:
   name: redmine-app
   namespace: anrisoftware-com
   labels:
-    app: redmine
+    app: redmine-app
     tier: frontend
     group: anrisoftware-com
 spec:
@@ -44,7 +44,7 @@ spec:
     port: 3000
     targetPort: 3000
   selector:
-    app: redmine
+    app: redmine-app
 
 ---
 
@@ -54,20 +54,20 @@ metadata:
   name: redmine-app
   namespace: anrisoftware-com
   labels:
-    app: redmine
+    app: redmine-app
     tier: frontend
     group: anrisoftware-com
 spec:
   replicas: 0
   selector:
     matchLabels:
-      app: redmine
+      app: redmine-app
       tier: frontend
       group: anrisoftware-com
   template:
     metadata:
       labels:
-        app: redmine
+        app: redmine-app
         tier: frontend
         group: anrisoftware-com
     spec:

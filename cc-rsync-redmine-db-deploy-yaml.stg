@@ -35,7 +35,7 @@ spec:
   replicas: 0
   selector:
     matchLabels:
-      app: rsync
+      app: rsync-mariadb
       tier: backup
       group: anrisoftware-com
   strategy:
@@ -43,7 +43,7 @@ spec:
   template:
     metadata:
       labels:
-        app: rsync
+        app: rsync-mariadb
         tier: backup
         group: anrisoftware-com
     spec:

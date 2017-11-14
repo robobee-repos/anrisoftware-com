@@ -28,14 +28,14 @@ metadata:
   name: rsync-gitlabce-app
   namespace: anrisoftware-com
   labels:
-    app: rsync
+    app: rsync-gitlabce-app
     tier: backup
     group: anrisoftware-com
 spec:
   replicas: 0
   selector:
     matchLabels:
-      app: rsync
+      app: rsync-gitlabce-app
       tier: backup
       group: anrisoftware-com
   strategy:
@@ -43,7 +43,7 @@ spec:
   template:
     metadata:
       labels:
-        app: rsync
+        app: rsync-gitlabce-app
         tier: backup
         group: anrisoftware-com
     spec:
