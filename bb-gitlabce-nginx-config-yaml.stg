@@ -40,8 +40,8 @@ data:
         client_max_body_size <vars.gitlabceapp.nginx.clientMaxBodySize>;
 <rest(vars.gitlabceapp.nginx.hosts):redirectHost(parent, vars);separator="\n">
         server {
-            listen 8080 default_server;
-            listen [::]:8080 default_server;
+            listen 8888 default_server;
+            listen [::]:8888 default_server;
             root /opt/gitlab/embedded/service/gitlab-rails/public;
             server_name <first(vars.gitlabceapp.nginx.hosts)>;
             index index.php;

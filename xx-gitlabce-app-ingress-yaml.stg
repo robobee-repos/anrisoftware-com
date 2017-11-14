@@ -37,5 +37,5 @@ hostRule(host) ::= <<
       - path: /
         backend:
           serviceName: gitlabce-app
-          servicePort: 8080
+          servicePort: 8888
 >>

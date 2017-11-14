@@ -38,8 +38,8 @@ metadata:
 spec:
   ports:
   - name: "http"
-    port: 8080
-    targetPort: 8080
+    port: 8888
+    targetPort: 8888
   - name: "ssh"
     port: 4444
     targetPort: 4444
@@ -112,18 +112,18 @@ spec:
       - image: <vars.gitlabceapp.nginx.image.name>:<vars.gitlabceapp.nginx.image.version>
         name: nginx
         ports:
-        - containerPort: 8080
+        - containerPort: 8888
           name: "http"
         livenessProbe:
           tcpSocket:
-            port: 8080
+            port: 8888
           initialDelaySeconds: 10
           periodSeconds: 60
           timeoutSeconds: 10
         readinessProbe:
           httpGet:
             path: /
-            port: 8080
+            port: 8888
           initialDelaySeconds: 60
           periodSeconds: 60
           timeoutSeconds: 10
