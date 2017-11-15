@@ -133,7 +133,7 @@ spec:
           name: redmine-app
       - name: passenger
         configMap:
-          name: redmine-passenger
+          name: redmine-passenger-r1
 <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
 <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
 <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>

@@ -11,7 +11,7 @@ bb-redmine-passenger-config-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-passenger
+  name: redmine-passenger-r1
   namespace: anrisoftware-com
   labels:
     app: redmine
@@ -43,6 +43,9 @@ data:
             application/javascript application/x-javascript application/json
             application/rss+xml application/vnd.ms-fontobject application/x-font-ttf
             application/xml font/opentype image/svg+xml text/xml;
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
 
         \<% if @app_finder.multi_mode? %>
             # Default server entry for mass deployment mode.
@@ -57,6 +60,7 @@ data:
             \<%= include_passenger_internal_template('server.erb', 8, true, binding) %>
             \<%= include_passenger_internal_template('rails_asset_pipeline.erb', 8, false) %>
             server_name <first(vars.redmineapp.nginx.hosts)>;
+            access_log  /var/log/nginx/access.log  main;
             #
             location = /favicon.ico {
               log_not_found off;
