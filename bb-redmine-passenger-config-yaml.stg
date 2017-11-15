@@ -11,7 +11,7 @@ bb-redmine-passenger-config-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-passenger-r1
+  name: redmine-passenger-r2
   namespace: anrisoftware-com
   labels:
     app: redmine
@@ -60,7 +60,7 @@ data:
             \<%= include_passenger_internal_template('server.erb', 8, true, binding) %>
             \<%= include_passenger_internal_template('rails_asset_pipeline.erb', 8, false) %>
             server_name <first(vars.redmineapp.nginx.hosts)>;
-            access_log  /var/log/nginx/access.log  main;
+            access_log  /dev/fd/1  main;
             #
             location = /favicon.ico {
               log_not_found off;
