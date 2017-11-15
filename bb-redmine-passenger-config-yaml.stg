@@ -13,7 +13,7 @@ bb-redmine-passenger-config-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-passenger-r3
+  name: redmine-passenger-r4
   namespace: anrisoftware-com
   labels:
     app: redmine
