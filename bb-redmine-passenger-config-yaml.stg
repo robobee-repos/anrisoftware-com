@@ -6,12 +6,14 @@
  * vars.redmineapp.nginx.workerConnections
  * vars.redmineapp.nginx.clientMaxBodySize
  * vars.redmineapp.nginx.hosts[]
+ * vars.redmineapp.passenger.maxPoolSize
+ * vars.redmineapp.passenger.minInstances
  */
 bb-redmine-passenger-config-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-passenger-r2
+  name: redmine-passenger-r3
   namespace: anrisoftware-com
   labels:
     app: redmine
@@ -35,6 +37,8 @@ data:
         access_log off;
         keepalive_timeout 60;
         underscores_in_headers on;
+        passenger_max_pool_size <vars.redmineapp.passenger.maxPoolSize>;
+        passenger_min_instances <vars.redmineapp.passenger.minInstances>;
         gzip on;
         gzip_comp_level 3;
         gzip_min_length 150;
