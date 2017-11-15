@@ -112,9 +112,6 @@ spec:
         - mountPath: "/var/www/html"
           name: data
           subPath: redmine_html
-        - mountPath: "/usr/local/bundle"
-          name: data
-          subPath: redmine_bundle
         - mountPath: /redmine-in
           name: config
         - mountPath: /passenger-in
