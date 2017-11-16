@@ -2,12 +2,14 @@
 * Mandatory:
 *
 * vars.gitlabceapp.nginx.hosts[]
+* vars.gitlabceapp.unicorn.workerProcesses
+* vars.gitlabceapp.unicorn.workerTimeout
 */
 bb-gitlabce-app-config-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitlabce-app
+  name: gitlabce-app-r1
   namespace: anrisoftware-com
   labels:
     app: gitlabce
@@ -20,5 +22,7 @@ data:
     nginx['enable'] = false
     gitlab_workhorse['listen_network'] = "tcp"
     gitlab_workhorse['listen_addr'] = "0.0.0.0:8181"
+    unicorn['worker_processes'] = 3
+    unicorn['worker_timeout'] = 60
 
 >>

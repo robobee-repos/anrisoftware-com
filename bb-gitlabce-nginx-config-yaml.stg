@@ -10,7 +10,7 @@ bb-gitlabce-nginx-config-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitlabce-nginx
+  name: gitlabce-nginx-r1
   namespace: anrisoftware-com
   labels:
     app: nginx

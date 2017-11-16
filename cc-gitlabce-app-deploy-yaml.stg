@@ -58,7 +58,7 @@ metadata:
     tier: frontend
     group: anrisoftware-com
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: gitlabce-app
@@ -78,7 +78,7 @@ spec:
         - name: GITLAB_OMNIBUS_CONFIG
           valueFrom:
             configMapKeyRef:
-              name: gitlabce-app
+              name: gitlabce-app-r1
               key: gitlab_omnibus_config
         ports:
         - containerPort: 4444
@@ -150,7 +150,7 @@ spec:
           claimName: anrisoftware-com-data
       - name: nginx-config
         configMap:
-          name: gitlabce-nginx
+          name: gitlabce-nginx-r1
 <affinitiesGroup(parent, vars, vars.gitlabceapp.affinityRequired)>
 <tolerationMaster(parent, vars, vars.gitlabceapp.allowOnMaster)>
 <tolerations(parent, vars, vars.gitlabceapp.tolerations, vars.gitlabceapp.allowOnMaster)>
