@@ -78,7 +78,7 @@ spec:
         - name: GITLAB_OMNIBUS_CONFIG
           valueFrom:
             configMapKeyRef:
-              name: gitlabce-app-r3
+              name: gitlabce-app-r4
               key: gitlab_omnibus_config
         ports:
         - containerPort: 4444
