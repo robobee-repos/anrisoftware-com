@@ -39,5 +39,5 @@ hostRule(host) ::= <<
       - path: /
         backend:
           serviceName: redmine-app
-          servicePort: 3000
+          servicePort: 8080
 >>
