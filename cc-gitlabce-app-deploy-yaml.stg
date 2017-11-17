@@ -58,7 +58,7 @@ metadata:
     tier: frontend
     group: anrisoftware-com
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: gitlabce-app
