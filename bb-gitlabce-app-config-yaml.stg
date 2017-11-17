@@ -25,5 +25,7 @@ data:
     gitlab_workhorse['listen_addr'] = "0.0.0.0:8181"
     unicorn['worker_processes'] = <vars.gitlabceapp.unicorn.workerProcesses>
     unicorn['worker_timeout'] = <vars.gitlabceapp.unicorn.workerTimeout>
+    postgresql['shared_buffers'] = "64MB"
+    postgresql['autovacuum_max_workers'] = "1"
 
 >>
