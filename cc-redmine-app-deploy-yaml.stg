@@ -182,7 +182,7 @@ spec:
           name: redmine-app
       - name: nginx-config
         configMap:
-          name: redmine-nginx-r1
+          name: redmine-nginx-r2
 <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
 <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
 <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
