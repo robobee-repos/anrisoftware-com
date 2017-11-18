@@ -5,12 +5,13 @@
 * vars.redmineapp.nginx.workerProcesses
 * vars.redmineapp.nginx.workerConnections
 * vars.redmineapp.nginx.clientMaxBodySize
+* vars.redmineapp.nginx.readTimeout
 */
 bb-redmine-nginx-config-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-nginx-r2
+  name: redmine-nginx-r3
   namespace: anrisoftware-com
   labels:
     app: redmine-app
@@ -31,16 +32,16 @@ data:
                           '$status $body_bytes_sent "$http_referer" '
                           '"$http_user_agent" "$http_x_forwarded_for"';
         access_log  /var/log/nginx/access.log  main;
-        sendfile        on;
-        tcp_nopush     on;
+        sendfile on;
+        tcp_nopush on;
         tcp_nodelay on;
         keepalive_timeout  65;
-        gzip  on;
+        gzip on;
         index index.php index.html index.htm;
         client_max_body_size <vars.redmineapp.nginx.clientMaxBodySize>;
-<rest(vars.redmineapp.nginx.hosts):redirectHost(parent, vars);separator="\n">
+        <rest(vars.redmineapp.nginx.hosts):redirectHost(parent, vars);separator="\n">
         upstream backend {
-            server 127.0.0.1:3000       max_fails=3 fail_timeout=300s;
+            server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.redmineapp.nginx.readTimeout>;
         }
         server {
             listen 8080 default_server;
@@ -48,6 +49,10 @@ data:
             root /var/www/html/public;
             server_name <first(vars.redmineapp.nginx.hosts)>;
             index index.php;
+            ## RJS.
+            location ~* ^.+new\.js$ {
+              <locationRootConfig(parent, vars)>
+            }
             ## All static files will be served directly.
             location ~* ^.+\.(?:css|js|jpe?g|gif|htc|ico|png|html)$ {
                 access_log off;
@@ -84,22 +89,16 @@ data:
               log_not_found off;
               access_log off;
             }
-            # Deny all attempts to access hidden files such as .htaccess, .htpasswd, .DS_Store (Mac).
-            # Keep logging the requests to parse later (or to pass to firewall utilities such as fail2ban)
+            # Deny all attempts to access hidden files such as:
+            # .htaccess, .htpasswd, .DS_Store (Mac).
+            # Keep logging the requests to parse later (or to pass to
+            # firewall utilities such as fail2ban)
             location ~ /\. {
               deny all;
             }
             #
             location / {
-              proxy_read_timeout      300;
-              proxy_connect_timeout   300;
-              proxy_redirect          off;
-              proxy_http_version 1.1;
-              proxy_set_header    Host $http_host;
-              proxy_set_header    X-Real-IP           $remote_addr;
-              proxy_set_header    X-Forwarded-For     $proxy_add_x_forwarded_for;
-              proxy_set_header    X-Forwarded-Proto   $scheme;
-              proxy_pass http://backend;
+              <locationRootConfig(parent, vars)>
             }
         }
     }
@@ -107,9 +106,21 @@ data:
 >>
 
 redirectHost(host, parent, vars) ::= <<
-        server {
-            root /opt/gitlab/embedded/service/gitlab-rails/public;
-            server_name <host>;
-            return 301 https://<first(vars.redmineapp.nginx.hosts)>$request_uri;
-        }
+server {
+    root /opt/gitlab/embedded/service/gitlab-rails/public;
+    server_name <host>;
+    return 301 https://<first(vars.redmineapp.nginx.hosts)>$request_uri;
+}
+>>
+
+locationRootConfig(parent, vars) ::= <<
+proxy_read_timeout      <vars.redmineapp.nginx.readTimeout>;
+proxy_connect_timeout   <vars.redmineapp.nginx.readTimeout>;
+proxy_redirect          off;
+proxy_http_version 1.1;
+proxy_set_header    Host $http_host;
+proxy_set_header    X-Real-IP           $remote_addr;
+proxy_set_header    X-Forwarded-For     $proxy_add_x_forwarded_for;
+proxy_set_header    X-Forwarded-Proto   $scheme;
+proxy_pass http://backend;
 >>
