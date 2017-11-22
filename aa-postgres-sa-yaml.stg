@@ -1,0 +1,12 @@
+/*
+ * 
+ */
+aa-postgres-sa-yaml(parent, vars) ::= <<
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: postgres-replica
+  namespace: anrisoftware-com
+  labels:
+    group: anrisoftware-com
+>>
