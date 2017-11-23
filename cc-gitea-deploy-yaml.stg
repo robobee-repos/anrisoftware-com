@@ -30,6 +30,7 @@
 import "nginx_config.stg"
 import "affinities.stg"
 import "tolerations.stg"
+import "ingress_config.stg"
 
 /*
  *
@@ -196,6 +197,22 @@ spec:
 <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
 <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
 <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gitea
+  namespace: anrisoftware-com
+  labels:
+    app: gitea
+    tier: frontend
+    group: anrisoftware-com
+  annotations:
+    <ingressDefaultAnnotations(parent, vars, vars.gitea.nginx)>
+spec:
+  <ingressDefaultSpec(parent, vars, "gitea">
 
 ---
 
