@@ -125,11 +125,6 @@ spec:
       - image: <vars.gitea.image.name>:<vars.gitea.image.version>
         name: gitea
         env:
-        - name: GITLAB_OMNIBUS_CONFIG
-          valueFrom:
-            configMapKeyRef:
-              name: gitea-r4
-              key: gitlab_omnibus_config
         ports:
         - containerPort: 22
           name: "ssh"
