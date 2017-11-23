@@ -207,7 +207,7 @@ metadata:
   annotations:
     <ingressDefaultAnnotations(parent, vars, vars.gitea.nginx)>
 spec:
-  <ingressDefaultSpec(parent, vars, "gitea")>
+  <ingressDefaultSpec(parent, vars, vars.gitea.nginx, "gitea")>
 
 ---
 

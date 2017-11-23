@@ -23,7 +23,7 @@ ingressDefaultSpec(parent, vars, nginx, name) ::= <<
 tls:
 - hosts:
   <nginx.hosts:{h|- <h>};separator="\n">
-  secretName: gitlabce-tls-secret
+  secretName: <name>-tls-secret
 rules:
   <nginx.hosts:hostRule(name);separator="\n">
 >>
