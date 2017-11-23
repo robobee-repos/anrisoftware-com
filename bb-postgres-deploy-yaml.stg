@@ -21,7 +21,7 @@
  * vars.postgres.tolerations[].effect
  * vars.postgres.tolerations[].value
  */
-aa-postgres-sa-yaml(parent, vars) ::= <<
+bb-postgres-deploy-yaml(parent, vars) ::= <<
 
 ---
 
