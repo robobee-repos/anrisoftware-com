@@ -42,7 +42,7 @@ cc-gitea-deploy-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitea-nginx-r1
+  name: gitea-nginx-r2
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -188,7 +188,7 @@ spec:
           claimName: anrisoftware-com-data
       - name: nginx-config
         configMap:
-          name: gitea-nginx-r1
+          name: gitea-nginx-r2
 <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
 <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
 <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
