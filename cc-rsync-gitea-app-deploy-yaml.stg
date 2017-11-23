@@ -10,10 +10,10 @@
  * 
  * Optional:
  * 
- * vars.gitlabceapp.affinityRequired
- * vars.gitlabceapp.tolerations[].key
- * vars.gitlabceapp.tolerations[].effect
- * vars.gitlabceapp.tolerations[].value
+ * vars.gitea.affinityRequired
+ * vars.gitea.tolerations[].key
+ * vars.gitea.tolerations[].effect
+ * vars.gitea.tolerations[].value
  */
 import "affinities.stg"
 import "tolerations.stg"
@@ -21,21 +21,21 @@ import "tolerations.stg"
 /*
  *
  */
-cc-rsync-gitlabce-app-deploy-yaml(parent, vars) ::= <<
+cc-rsync-gitea-deploy-yaml(parent, vars) ::= <<
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: rsync-gitlabce-app
+  name: rsync-gitea
   namespace: anrisoftware-com
   labels:
-    app: rsync-gitlabce-app
+    app: rsync-gitea
     tier: backup
     group: anrisoftware-com
 spec:
   replicas: 0
   selector:
     matchLabels:
-      app: rsync-gitlabce-app
+      app: rsync-gitea
       tier: backup
       group: anrisoftware-com
   strategy:
@@ -43,13 +43,13 @@ spec:
   template:
     metadata:
       labels:
-        app: rsync-gitlabce-app
+        app: rsync-gitea
         tier: backup
         group: anrisoftware-com
     spec:
       containers:
       - image: <vars.rsync.image.name>:<vars.rsync.image.version>
-        name: rsync-gitlabce-app
+        name: rsync-gitea
         env:
         - name: RSYNC_AUTHORIZED_KEY
           valueFrom:
@@ -65,7 +65,7 @@ spec:
           exec:
             command:
             - /readiness.sh
-            - /data/Rakefile
+            - /data/gitea/conf/app.ini
           initialDelaySeconds: 5
           timeoutSeconds: 1
         resources:
@@ -76,25 +76,16 @@ spec:
             cpu: <vars.rsync.requests.cpu>
             memory: <vars.rsync.requests.memory>
         volumeMounts:
-        - mountPath: "/etc/gitlab"
+        - mountPath: "/data"
           name: data
-          subPath: gitlab_ce_etc
-        - mountPath: "/var/log/gitlab"
-          name: data
-          subPath: gitlab_ce_log
-        - mountPath: "/var/opt/gitlab"
-          name: data
-          subPath: gitlab_ce_var
-        - mountPath: "/opt/gitlab/embedded/service/gitlab-rails/public"
-          name: data
-          subPath: gitlab_ce_public
+          subPath: gitea_data
       restartPolicy: Always
       volumes:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-<affinitiesGroup(parent, vars, vars.gitlabceapp.affinityRequired)>
-<tolerationMaster(parent, vars, vars.gitlabceapp.allowOnMaster)>
-<tolerations(parent, vars, vars.gitlabceapp.tolerations, vars.gitlabceapp.allowOnMaster)>
+<affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
+<tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
+<tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
 
 >>
