@@ -31,7 +31,7 @@
 import "affinities.stg"
 import "tolerations.stg"
 
-bb-postgres-deploy-yaml(parent, vars) ::= <<
+cc-postgres-deploy-yaml(parent, vars) ::= <<
 
 ---
 
