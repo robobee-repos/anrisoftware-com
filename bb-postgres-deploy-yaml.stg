@@ -79,9 +79,35 @@ data:
 kind: Service
 apiVersion: v1
 metadata:
+  name: postgres-set
+  namespace: anrisoftware-com
+  labels:
+    name: postgres-set
+    app: postgres
+    tier: backend
+    group: anrisoftware-com
+spec:
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+  selector:
+    name: postgres-set
+  type: ClusterIP
+  sessionAffinity: None
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
   name: postgres-primary
+  namespace: anrisoftware-com
   labels:
     name: postgres-primary
+    app: postgres
+    tier: backend
+    group: anrisoftware-com
 spec:
   ports:
   - protocol: TCP
@@ -99,8 +125,12 @@ kind: Service
 apiVersion: v1
 metadata:
   name: postgres-replica
+  namespace: anrisoftware-com
   labels:
     name: postgres-replica
+    app: postgres
+    tier: backend
+    group: anrisoftware-com
 spec:
   ports:
   - protocol: TCP
@@ -117,14 +147,15 @@ spec:
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: postgres
+  name: postgres-set
   namespace: anrisoftware-com
   labels:
+    name: postgres-set
     app: postgres
     tier: backend
     group: anrisoftware-com
 spec:
-  serviceName: postgres-replica
+  serviceName: postgres-set
   replicas: 2
   updateStrategy:
     type: RollingUpdate
