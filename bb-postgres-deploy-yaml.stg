@@ -213,6 +213,20 @@ spec:
             secretKeyRef:
               name: postgres-r1
               key: root_password
+        livenessProbe:
+          exec:
+            command:
+            - /opt/cpm/bin/liveness.sh
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - /opt/cpm/bin/readiness.sh
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 10
         resources:
           limits:
             cpu: <vars.postgres.limits.cpu>
