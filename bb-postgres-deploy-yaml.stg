@@ -133,6 +133,8 @@ spec:
         name: postgres-replica
     spec:
       serviceAccount: postgres-replica
+      updateStrategy:
+        type: RollingUpdate
       securityContext:
         fsGroup: 26
       containers:
