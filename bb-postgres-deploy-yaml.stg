@@ -193,6 +193,22 @@ spec:
         - name: pgdata
           mountPath: "/pgdata"
           subPath: "pgdata"
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 120
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -i
+            - -c
+            - psql -h "$PG_PRIMARY_HOST" -p "$PG_PRIMARY_PORT" -U "$PG_PRIMARY_USER" "$PG_DATABASE" -f /opt/cpm/bin/readiness.sql
+          initialDelaySeconds: 120
+          periodSeconds: 60
+          timeoutSeconds: 10
       volumes:
       - name: pgdata
         persistentVolumeClaim:
