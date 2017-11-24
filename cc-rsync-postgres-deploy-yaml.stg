@@ -70,8 +70,8 @@ spec:
             memory: <vars.rsync.requests.memory>
         volumeMounts:
         - mountPath: "/data"
+          subPath: "pgdata"
           name: data
-          subPath: postgres_data
       restartPolicy: Always
       volumes:
       - name: data
