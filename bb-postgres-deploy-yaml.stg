@@ -59,7 +59,7 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: postgres
+  name: postgres-r1
   namespace: anrisoftware-com
   labels:
     app: postgres
@@ -73,6 +73,44 @@ data:
   password: <vars.postgres.password;format="base64">
   database: <vars.postgres.database;format="base64">
   root_password: <vars.postgres.rootPassword;format="base64">
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: postgres-primary
+  labels:
+    name: postgres-primary
+spec:
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+    nodePort: 0
+  selector:
+    name: postgres-primary
+  type: ClusterIP
+  sessionAffinity: None
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: postgres-replica
+  labels:
+    name: postgres-replica
+spec:
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+    nodePort: 0
+  selector:
+    name: postgres-replica
+  type: ClusterIP
+  sessionAffinity: None
 
 ---
 
@@ -109,38 +147,38 @@ spec:
         - name: PG_MODE
           value: set
         - name: PG_PRIMARY_HOST
-          value: pgset-primary
+          value: postgres-primary
         - name: PG_PRIMARY_PORT
           value: '5432'
         - name: PG_PRIMARY_USER
           valueFrom:
             secretKeyRef:
-              name: postgres
+              name: postgres-r1
               key: primary_user
         - name: PG_PRIMARY_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres
+              name: postgres-r1
               key: primary_password
         - name: PG_USER
           valueFrom:
             secretKeyRef:
-              name: postgres
+              name: postgres-r1
               key: user
         - name: PG_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres
+              name: postgres-r1
               key: password
         - name: PG_DATABASE
           valueFrom:
             secretKeyRef:
-              name: postgres
+              name: postgres-r1
               key: database
         - name: PG_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres
+              name: postgres-r1
               key: root_password
         resources:
           limits:
