@@ -205,7 +205,7 @@ spec:
             - /bin/sh
             - -i
             - -c
-            - psql -h "$PG_PRIMARY_HOST" -p "$PG_PRIMARY_PORT" -U "$PG_PRIMARY_USER" "$PG_DATABASE" -f /opt/cpm/bin/readiness.sql
+            - psql -h "127.0.0.1" -p "$PG_PRIMARY_PORT" -U "$PG_PRIMARY_USER" "$PG_DATABASE" -f /opt/cpm/bin/readiness.sql
           initialDelaySeconds: 120
           periodSeconds: 60
           timeoutSeconds: 10
