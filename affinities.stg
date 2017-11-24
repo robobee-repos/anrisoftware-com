@@ -2,35 +2,35 @@
  *
  */
 affinitiesGroup(parent, vars, affinityRequired) ::= <<
-      affinity:
-        nodeAffinity:
+affinity:
+  nodeAffinity:
 <if(affinityRequired)>
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: muellerpublic.de/dev
-                operator: In
-                values:
-                - required
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: muellerpublic.de/dev
+          operator: In
+          values:
+          - required
 <else>
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            preference:
-              matchExpressions:
-              - key: muellerpublic.de/dev
-                operator: In
-                values:
-                - preferred
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 1
+      preference:
+        matchExpressions:
+        - key: muellerpublic.de/dev
+          operator: In
+          values:
+          - preferred
 <endif>
-        podAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: muellerpublic.de/group
-                  operator: In
-                  values:
-                  - anrisoftware
-              topologyKey: kubernetes.io/hostname
+  podAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: muellerpublic.de/group
+            operator: In
+            values:
+            - anrisoftware
+        topologyKey: kubernetes.io/hostname
 >>
