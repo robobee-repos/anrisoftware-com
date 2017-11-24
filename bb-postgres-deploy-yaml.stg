@@ -158,7 +158,7 @@ spec:
   serviceName: postgres-set
   replicas: 2
   updateStrategy:
-    type: RollingUpdate
+    type: OnDelete
   template:
     metadata:
       labels:
