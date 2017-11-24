@@ -278,9 +278,9 @@ spec:
       - name: pgpool-config
         configMap:
           name: pgpool-r1
-<affinitiesGroup(parent, vars, vars.pgpool.affinityRequired)>
-<tolerationMaster(parent, vars, vars.pgpool.allowOnMaster)>
-<tolerations(parent, vars, vars.pgpool.tolerations, vars.pgpool.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.pgpool.affinityRequired)>
+      <tolerationMaster(parent, vars, vars.pgpool.allowOnMaster)>
+      <tolerations(parent, vars, vars.pgpool.tolerations, vars.pgpool.allowOnMaster)>
 
 ---
 

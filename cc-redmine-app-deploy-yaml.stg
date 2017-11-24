@@ -29,13 +29,71 @@
  * vars.redmineapp.tolerations[].value
  */
 
+import "nginx_config.stg"
 import "affinities.stg"
 import "tolerations.stg"
+import "ingress_config.stg"
 
 /*
  *
  */
 cc-redmine-app-deploy-yaml(parent, vars) ::= <<
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redmine-app
+  namespace: anrisoftware-com
+  labels:
+    app: redmine
+    tier: frontend
+    group: anrisoftware-com
+data:
+  additional_environment.rb: |
+    config.log_level = :warn
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redmine-nginx-r3
+  namespace: anrisoftware-com
+  labels:
+    app: nginx
+    tier: frontend
+    group: anrisoftware-com
+data:
+  nginx.conf: |
+    <nginxDefaults(parent, vars)>
+    http {
+        upstream backend {
+            server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.redmineapp.nginx.readTimeout>;
+        }
+        <nginxVirtualHosts(parent, vars)>
+        server {
+            listen 8080 default_server;
+            listen [::]:8080 default_server;
+            server_name <first(vars.redmineapp.nginx.hosts)>;
+            root /var/www/html/public;
+            index index.php;
+            ## RJS.
+            location ~* ^.+new\.js$ {
+              <nginxRootProxyPassBackendLocationConfig(parent, vars)>
+            }
+            <nginxDefaultLocations(parent, vars)>
+            ## Protect .git files.
+            location ^~ /.git {
+                return 404;
+            }
+            #
+            location / {
+              <nginxRootProxyPassBackendLocationConfig(parent, vars)>
+            }
+        }
+    }
 
 ---
 
@@ -183,9 +241,25 @@ spec:
       - name: nginx-config
         configMap:
           name: redmine-nginx-r3
-<affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
-<tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
-<tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
+      <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
+      <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: redmine-app
+  namespace: anrisoftware-com
+  labels:
+    app: redmine-app
+    tier: frontend
+    group: anrisoftware-com
+  annotations:
+    <ingressDefaultAnnotations(parent, vars, vars.redmineapp.nginx)>
+spec:
+  <ingressDefaultSpec(parent, vars, vars.redmineapp.nginx, "redmine-app")>
 
 ---
 

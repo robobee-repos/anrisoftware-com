@@ -115,15 +115,15 @@ spec:
         - mountPath: "/opt/bitnami/mariadb/logs"
           name: data
           subPath: redminedb_logs
-<readinessProbe(parent, vars)>
+        <readinessProbe(parent, vars)>
       restartPolicy: Always
       volumes:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-<affinitiesGroup(parent, vars, vars.redminedb.affinityRequired)>
-<tolerationMaster(parent, vars, vars.redminedb.allowOnMaster)>
-<tolerations(parent, vars, vars.redminedb.tolerations, vars.redminedb.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.redminedb.affinityRequired)>
+      <tolerationMaster(parent, vars, vars.redminedb.allowOnMaster)>
+      <tolerations(parent, vars, vars.redminedb.tolerations, vars.redminedb.allowOnMaster)>
 
 ---
 

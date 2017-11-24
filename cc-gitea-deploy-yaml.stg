@@ -189,9 +189,9 @@ spec:
       - name: nginx-config
         configMap:
           name: gitea-nginx-r2
-<affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
-<tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
-<tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
+      <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
+      <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
 
 ---
 

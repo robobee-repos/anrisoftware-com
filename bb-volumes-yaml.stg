@@ -4,7 +4,7 @@
  * vars.volumes.data.storage
  *
  */
-aa-volumes-yaml(parent, vars) ::= <<
+bb-volumes-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

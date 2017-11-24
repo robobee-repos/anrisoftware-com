@@ -87,8 +87,8 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-<affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
-<tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
-<tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
+      <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
+      <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
 
 >>
