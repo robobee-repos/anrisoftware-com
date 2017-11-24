@@ -21,6 +21,10 @@
  * vars.postgres.tolerations[].effect
  * vars.postgres.tolerations[].value
  */
+
+import "affinities.stg"
+import "tolerations.stg"
+
 bb-postgres-deploy-yaml(parent, vars) ::= <<
 
 ---
