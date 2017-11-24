@@ -126,6 +126,8 @@ metadata:
 spec:
   serviceName: postgres-replica
   replicas: 2
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -133,8 +135,6 @@ spec:
         name: postgres-replica
     spec:
       serviceAccount: postgres-replica
-      updateStrategy:
-        type: RollingUpdate
       securityContext:
         fsGroup: 26
       containers:
