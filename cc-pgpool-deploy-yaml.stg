@@ -113,24 +113,24 @@ data:
     master_slave_mode = on
     master_slave_sub_mode = 'stream'
     sr_check_period = 10
-    sr_check_user = 'testdb'
-    sr_check_password = 'testdb'
+    sr_check_user = '<vars.pgpool.user>'
+    sr_check_password = '<vars.pgpool.password>'
     delay_threshold = 10000000
     follow_master_command = ''
     parallel_mode = off
     pgpool2_hostname = ''
     health_check_period = 30
     health_check_timeout = 20
-    health_check_user = 'testdb'
-    health_check_password = 'testdb'
+    health_check_user = '<vars.pgpool.user>'
+    health_check_password = '<vars.pgpool.password>'
     health_check_max_retries = 0
     health_check_retry_delay = 1
     failover_command = ''
     failback_command = ''
     fail_over_on_backend_error = on
     search_primary_node_timeout = 10
-    recovery_user = 'testdb'
-    recovery_password = 'testdb'
+    recovery_user = '<vars.pgpool.user>'
+    recovery_password = '<vars.pgpool.password>'
     recovery_1st_stage_command = ''
     recovery_2nd_stage_command = ''
     recovery_timeout = 90
@@ -239,7 +239,7 @@ spec:
             secretKeyRef:
               name: pgpool-r1
               key: primary_password
-        - name: PG_USER
+        - name: PG_USERNAME
           valueFrom:
             secretKeyRef:
               name: pgpool-r1
@@ -249,11 +249,6 @@ spec:
             secretKeyRef:
               name: pgpool-r1
               key: password
-        - name: PG_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: pgpool-r1
-              key: database
         ports:
         - containerPort: 5432
           name: "postgres"
