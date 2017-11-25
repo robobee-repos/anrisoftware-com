@@ -74,19 +74,42 @@ server {
  *
  */
 nginxDefaultLocations(parent, vars) ::= <<
+<nginxLocationStaticFiles(parent, vars)>
+<nginxLocationFavicon(parent, vars)>
+<nginxLocationRobots(parent, vars)>
+<nginxLocationHidden(parent, vars)>
+>>
+
+/*
+ *
+ */
+nginxLocationStaticFiles(parent, vars) ::= <<
 ## All static files will be served directly.
 location ~* ^.+\.(?:css|js|jpe?g|gif|htc|ico|png|html)$ {
-    #access_log off;
-    expires 30d;
-    ## No need to bleed constant updates.
-    ## Send the all shebang in one fell swoop.
-    tcp_nodelay off;
-    ## Set the OS file cache.
-    open_file_cache max=3000 inactive=120s;
-    open_file_cache_valid 45s;
-    open_file_cache_min_uses 2;
-    open_file_cache_errors off;
+    <nginxLocationStaticFilesConfig(parent, vars)>
 }
+>>
+
+/*
+ *
+ */
+nginxLocationStaticFilesConfig(parent, vars) ::= <<
+#access_log off;
+expires 30d;
+## No need to bleed constant updates.
+## Send the all shebang in one fell swoop.
+tcp_nodelay off;
+## Set the OS file cache.
+open_file_cache max=3000 inactive=120s;
+open_file_cache_valid 45s;
+open_file_cache_min_uses 2;
+open_file_cache_errors off;
+>>
+
+/*
+ *
+ */
+nginxLocationFavicon(parent, vars) ::= <<
 ## Support for favicon.
 ## Return an 1x1 transparent GIF if it doesn't exist.
 location = /favicon.ico {
@@ -100,12 +123,20 @@ location @empty {
     empty_gif;
     access_log off;
 }
+
+/*
+ *
+ */
+nginxLocationRobots(parent, vars) ::= <<
 #
 location = /robots.txt {
   allow all;
   log_not_found off;
   access_log off;
 }
+>>
+
+nginxLocationHidden(parent, vars) ::= <<
 # Deny all attempts to access hidden files such as .htaccess, .htpasswd, .DS_Store (Mac).
 # Keep logging the requests to parse later (or to pass to firewall utilities such as fail2ban)
 location ~ /\. {

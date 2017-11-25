@@ -59,7 +59,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-nginx-r5
+  name: redmine-nginx-r6
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -79,14 +79,16 @@ data:
             server_name <first(vars.redmineapp.nginx.hosts)>;
             root /var/www/html/public;
             index index.php;
-            ## RJS.
-            location ~* ^.+(new\.js)|(uploads\.js)|(autocomplete\.js)$ {
-              <nginxRootProxyPassBackendLocationConfig(parent, vars)>
-            }
-            <nginxDefaultLocations(parent, vars)>
+            <nginxLocationFavicon(parent, vars)>
+            <nginxLocationRobots(parent, vars)>
+            <nginxLocationHidden(parent, vars)>
             ## Protect .git files.
             location ^~ /.git {
                 return 404;
+            }
+            ## All static files will be served directly.
+            location ~* ^^(?:(?:help\/)|(?:images\/)|(?:javascripts\/)|(?:plugin_assets\/)|(?:stylesheets\/)|(?:themes\/)).+\.(?:css|js|jpe?g|gif|htc|ico|png|html)$$ {
+                <nginxLocationStaticFilesConfig(parent, vars)>
             }
             #
             location / {
@@ -240,7 +242,7 @@ spec:
           name: redmine-app
       - name: nginx-config
         configMap:
-          name: redmine-nginx-r5
+          name: redmine-nginx-r6
       <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
       <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
       <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
