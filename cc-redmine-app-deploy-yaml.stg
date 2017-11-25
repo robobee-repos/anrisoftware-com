@@ -80,7 +80,7 @@ data:
             root /var/www/html/public;
             index index.php;
             ## RJS.
-            location ~* ^.+(new\.js)|(uploads\.js)$ {
+            location ~* ^.+(new\.js)|(uploads\.js)|(autocomplete\.js)$ {
               <nginxRootProxyPassBackendLocationConfig(parent, vars)>
             }
             <nginxDefaultLocations(parent, vars)>
