@@ -59,7 +59,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-nginx-r4
+  name: redmine-nginx-r5
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -240,7 +240,7 @@ spec:
           name: redmine-app
       - name: nginx-config
         configMap:
-          name: redmine-nginx-r4
+          name: redmine-nginx-r5
       <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
       <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
       <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
