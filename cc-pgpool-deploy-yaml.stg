@@ -265,7 +265,10 @@ spec:
             cpu: <vars.pgpool.requests.cpu>
             memory: <vars.pgpool.requests.memory>
         volumeMounts:
-        - mountPath: /pgconf/pgpoolconfigdir
+        - mountPath: "/pgconf"
+          name: data
+          subPath: pgpool_conf
+        - mountPath: /pgpool-in
           name: pgpool-config
         livenessProbe:
           tcpSocket:
@@ -275,6 +278,9 @@ spec:
           timeoutSeconds: 10
       restartPolicy: Always
       volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: anrisoftware-com-data
       - name: pgpool-config
         configMap:
           name: pgpool-r1
