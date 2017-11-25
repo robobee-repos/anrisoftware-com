@@ -53,13 +53,15 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: pgpool-r1
+  name: pgpool-r2
   namespace: anrisoftware-com
   labels:
     app: pgpool
     tier: backend
     group: anrisoftware-com
 data:
+  pool_hba.conf: |
+    host    all         all         0.0.0.0/0          md5
   pgpool.conf: |
     listen_addresses = '*'
     port = 5432
@@ -283,7 +285,7 @@ spec:
           claimName: anrisoftware-com-data
       - name: pgpool-config
         configMap:
-          name: pgpool-r1
+          name: pgpool-r2
       <affinitiesGroup(parent, vars, vars.pgpool.affinityRequired)>
       <tolerationMaster(parent, vars, vars.pgpool.allowOnMaster)>
       <tolerations(parent, vars, vars.pgpool.tolerations, vars.pgpool.allowOnMaster)>
