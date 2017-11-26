@@ -104,8 +104,29 @@ spec:
     port: 8080
     targetPort: 8080
   - name: "ssh"
-    port: 4444
+    port: 22
     targetPort: 4444
+  selector:
+    app: gitea
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: git-public
+  namespace: anrisoftware-com
+  labels:
+    app: gitea
+    tier: backend
+    group: anrisoftware-com
+spec:
+  type: NodePort
+  ports:
+  - name: "ssh"
+    port: 22
+    targetPort: 4444
+    nodePort: 30022
   selector:
     app: gitea
 
