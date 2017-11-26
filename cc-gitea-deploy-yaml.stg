@@ -254,14 +254,25 @@ spec:
             secretKeyRef:
               name: gitea-db-r1
               key: database
+        - name: POSTGRESQL_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-r2
+              key: admin_password
+        - name: PGHOST
+          value: "postgres"
+        - name: PGPORT
+          value: "5432"
+        - name: PGUSER
+          value: "postgres"
         command:
         - /bin/sh
         - -i
         - -c
         - while ! PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql "postgresql://postgres@postgres" -c "SELECT 1;"; do sleep 3; done;
-        - createuser $POSTGRESQL_USER;
-        - createdb --owner=$POSTGRESQL_USER $POSTGRESQL_DATABASE;
-        - psql --command "ALTER USER \"${POSTGRESQL_USER}\" WITH ENCRYPTED PASSWORD '${POSTGRESQL_PASSWORD}';"
+        - PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} createuser $POSTGRESQL_USER;
+        - PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} createdb --owner=$POSTGRESQL_USER $POSTGRESQL_DATABASE;
+        - PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql --command "ALTER USER \"${POSTGRESQL_USER}\" WITH ENCRYPTED PASSWORD '${POSTGRESQL_PASSWORD}';"
       restartPolicy: Never
   backoffLimit: 4
 
