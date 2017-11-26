@@ -60,7 +60,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-nginx-r8
+  name: redmine-nginx-r9
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -79,7 +79,7 @@ data:
         server {
             listen 8080 default_server;
             listen [::]:8080 default_server;
-            server_name <first(vars.nginx.hosts)>;
+            server_name <first(vars.redmineapp.nginx.hosts)>;
             root /var/www/html/public;
             index index.php;
             <nginxLocationFavicon(parent, vars)>
@@ -239,7 +239,7 @@ spec:
           name: redmine-app
       - name: nginx-config
         configMap:
-          name: redmine-nginx-r8
+          name: redmine-nginx-r9
       <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
       <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
       <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
