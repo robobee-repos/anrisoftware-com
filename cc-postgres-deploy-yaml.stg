@@ -115,7 +115,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: postgres-r2
-              key: root_password
+              key: admin_password
         resources:
           limits:
             cpu: <vars.postgres.limits.cpu>
