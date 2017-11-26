@@ -59,7 +59,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitea-nginx-r4
+  name: gitea-nginx-r5
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -79,7 +79,9 @@ data:
             listen [::]:8080 default_server;
             server_name <first(vars.gitea.nginx.hosts)>;
             root /var/www/html;
-            <nginxDefaultLocations(parent, vars)>
+            <nginxLocationFavicon(parent, vars)>
+            <nginxLocationRobots(parent, vars)>
+            <nginxLocationHidden(parent, vars)>
             <nginxLocationGitFiles(parent, vars)>
             <nginxRootProxyPassBackendLocation(parent, vars)>
         }
@@ -176,7 +178,7 @@ spec:
           httpGet:
             path: /
             port: 8080
-          initialDelaySeconds: 600
+          initialDelaySeconds: 60
           periodSeconds: 60
           timeoutSeconds: 10
         resources:
@@ -199,7 +201,7 @@ spec:
           claimName: anrisoftware-com-data
       - name: nginx-config
         configMap:
-          name: gitea-nginx-r4
+          name: gitea-nginx-r5
       <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
       <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
       <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
