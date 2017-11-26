@@ -1,24 +1,20 @@
 /*
  * Mandatory:
  *
- * vars.gitea.nginx.workerProcesses
- * vars.gitea.nginx.workerConnections
+ * vars.nginx.workerProcesses
+ * vars.nginx.workerConnections
  *
  */
 nginxDefaults(parent, vars) ::= <<
-worker_processes <vars.gitea.nginx.workerProcesses>;
+worker_processes <vars.nginx.workerProcesses>;
 error_log /var/log/nginx/error.log warn;
 pid /var/run/nginx.pid;
 events {
-  worker_connections  <vars.gitea.nginx.workerConnections>;
+  worker_connections  <vars.nginx.workerConnections>;
 }
 >>
 
 /*
- * Mandatory:
- *
- * vars.gitea.nginx.workerProcesses
- * vars.gitea.nginx.workerConnections
  *
  */
 nginxHttpDefaults(parent, vars) ::= <<
@@ -39,15 +35,18 @@ tcp_nodelay on;
 gzip on;
 keepalive_timeout 65;
 index index.php index.html index.htm;
-client_max_body_size <vars.gitea.nginx.clientMaxBodySize>;
+client_max_body_size <vars.nginx.clientMaxBodySize>;
 >>
 
 /*
+ * Mandatory:
+ *
+ * vars.nginx.readTimeout
  *
  */
 nginxRootProxyPassBackendLocationConfig(parent, vars) ::= <<
-proxy_read_timeout      <vars.gitea.nginx.readTimeout>;
-proxy_connect_timeout   <vars.gitea.nginx.readTimeout>;
+proxy_read_timeout      <vars.nginx.readTimeout>;
+proxy_connect_timeout   <vars.nginx.readTimeout>;
 proxy_redirect      off;
 proxy_http_version  1.1;
 proxy_set_header    Host $http_host;
@@ -58,20 +57,20 @@ proxy_pass          http://backend;
 >>
 
 /*
- * vars.gitea.nginx.hosts[]
+ * 
  */
-nginxVirtualHosts(parent, vplars) ::= <<
-  <rest(vars.gitea.nginx.hosts):redirectHost(parent, vars);separator="\n">
+nginxVirtualHosts(parent, vars, hosts) ::= <<
+  <rest(hosts):redirectHost(parent, vars, hosts);separator="\n">
 >>
 
 /*
- * vars.gitea.nginx.hosts[]
+ * 
  */
-redirectHost(host, parent, vars) ::= <<
+redirectHost(host, parent, vars, hosts) ::= <<
 server {
   root /var/www/html;
   server_name <host>;
-  return 301 https://<first(vars.gitea.nginx.hosts)>$request_uri;
+  return 301 https://<first(hosts)>$request_uri;
 }
 >>
 
@@ -83,6 +82,16 @@ nginxDefaultLocations(parent, vars) ::= <<
 <nginxLocationFavicon(parent, vars)>
 <nginxLocationRobots(parent, vars)>
 <nginxLocationHidden(parent, vars)>
+>>
+
+/*
+ *
+ */
+nginxRootProxyPassBackendLocation(parent, vars) ::= <<
+#
+location / {
+  <nginxRootProxyPassBackendLocationConfig(parent, vars)>
+}
 >>
 
 /*
@@ -146,6 +155,13 @@ nginxLocationHidden(parent, vars) ::= <<
 # Keep logging the requests to parse later (or to pass to firewall utilities such as fail2ban)
 location ~ /\. {
   deny all;
+}
+>>
+
+nginxLocationGitFiles(parent, vars) ::= <<
+## Protect .git files.
+location ^~ /.git {
+    return 404;
 }
 >>
 

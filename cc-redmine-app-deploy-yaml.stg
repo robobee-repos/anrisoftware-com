@@ -7,19 +7,20 @@
  * vars.redmineapp.limits.memory
  * vars.redmineapp.requests.cpu
  * vars.redmineapp.requests.memory
- * vars.redmineapp.nginx.image.name
- * vars.redmineapp.nginx.image.version
- * vars.redmineapp.nginx.limits.cpu
- * vars.redmineapp.nginx.limits.memory
- * vars.redmineapp.nginx.requests.cpu
- * vars.redmineapp.nginx.requests.memory
- * vars.redmineapp.nginx.workerProcesses
- * vars.redmineapp.nginx.workerConnections
- * vars.redmineapp.nginx.clientMaxBodySize
+ * vars.redmineapp.nginx.hosts[]
  * vars.redmineapp.puma.minThreads
  * vars.redmineapp.puma.maxThreads
  * vars.redmineapp.pume.workers
  * vars.redmineapp.pume.timeout
+ * vars.nginx.image.name
+ * vars.nginx.image.version
+ * vars.nginx.limits.cpu
+ * vars.nginx.limits.memory
+ * vars.nginx.requests.cpu
+ * vars.nginx.requests.memory
+ * vars.nginx.workerProcesses
+ * vars.nginx.workerConnections
+ * vars.nginx.clientMaxBodySize
  * 
  * Optional:
  * 
@@ -72,30 +73,24 @@ data:
         set_real_ip_from 10.0.0.0/8;
         real_ip_header X-Forwarded-For;
         upstream backend {
-            server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.redmineapp.nginx.readTimeout>;
+            server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.nginx.readTimeout>;
         }
-        <nginxVirtualHosts(parent, vars)>
+        <nginxVirtualHosts(parent, vars, vars.redmineapp.nginx.hosts)>
         server {
             listen 8080 default_server;
             listen [::]:8080 default_server;
-            server_name <first(vars.redmineapp.nginx.hosts)>;
+            server_name <first(vars.nginx.hosts)>;
             root /var/www/html/public;
             index index.php;
             <nginxLocationFavicon(parent, vars)>
             <nginxLocationRobots(parent, vars)>
             <nginxLocationHidden(parent, vars)>
-            ## Protect .git files.
-            location ^~ /.git {
-                return 404;
-            }
+            <nginxLocationGitFiles(parent, vars)>
             ## All static files will be served directly.
-            location ~* ^^(?:(?:help\/)|(?:images\/)|(?:javascripts\/)|(?:plugin_assets\/)|(?:stylesheets\/)|(?:themes\/)).+\.(?:css|js|jpe?g|gif|htc|ico|png|html)$$ {
+            location ~* ^(?:(?:help\/)|(?:images\/)|(?:javascripts\/)|(?:plugin_assets\/)|(?:stylesheets\/)|(?:themes\/)).+\.(?:css|js|jpe?g|gif|htc|ico|png|html)$ {
                 <nginxLocationStaticFilesConfig(parent, vars)>
             }
-            #
-            location / {
-              <nginxRootProxyPassBackendLocationConfig(parent, vars)>
-            }
+            <nginxRootProxyPassBackendLocation(parent, vars)>
         }
     }
 
@@ -203,7 +198,7 @@ spec:
           initialDelaySeconds: 300
           periodSeconds: 60
           timeoutSeconds: 10
-      - image: <vars.redmineapp.nginx.image.name>:<vars.redmineapp.nginx.image.version>
+      - image: <vars.nginx.image.name>:<vars.nginx.image.version>
         name: nginx
         ports:
         - containerPort: 8080
@@ -223,11 +218,11 @@ spec:
           timeoutSeconds: 10
         resources:
           limits:
-            cpu: <vars.redmineapp.nginx.limits.cpu>
-            memory: <vars.redmineapp.nginx.limits.memory>
+            cpu: <vars.nginx.limits.cpu>
+            memory: <vars.nginx.limits.memory>
           requests:
-            cpu: <vars.redmineapp.nginx.requests.cpu>
-            memory: <vars.redmineapp.nginx.requests.memory>
+            cpu: <vars.nginx.requests.cpu>
+            memory: <vars.nginx.requests.memory>
         volumeMounts:
         - mountPath: "/var/www/html"
           name: data

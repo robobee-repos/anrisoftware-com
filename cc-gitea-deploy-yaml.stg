@@ -8,16 +8,16 @@
  * vars.gitea.requests.cpu
  * vars.gitea.requests.memory
  * vars.gitea.nginx.hosts[]
- * vars.gitea.nginx.workerProcesses
- * vars.gitea.nginx.workerConnections
- * vars.gitea.nginx.clientMaxBodySize
- * vars.gitea.nginx.readTimeout
  * vars.nginx.image.name
  * vars.nginx.image.version
  * vars.nginx.limits.cpu
  * vars.nginx.limits.memory
  * vars.nginx.requests.cpu
  * vars.nginx.requests.memory
+ * vars.nginx.workerProcesses
+ * vars.nginx.workerConnections
+ * vars.nginx.clientMaxBodySize
+ * vars.nginx.readTimeout
  * 
  * Optional:
  * 
@@ -42,7 +42,7 @@ cc-gitea-deploy-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitea-nginx-r2
+  name: gitea-nginx-r3
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -53,24 +53,17 @@ data:
     <nginxDefaults(parent, vars)>
     http {
         upstream backend {
-            server localhost:3000 max_fails=3 fail_timeout=<vars.gitea.nginx.readTimeout>;
+            server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.nginx.readTimeout>;
         }
-        <nginxVirtualHosts(parent, vars)>
+        <nginxVirtualHosts(parent, vars, vars.gitea.nginx.hosts)>
         server {
             listen 8080 default_server;
             listen [::]:8080 default_server;
             server_name <first(vars.gitea.nginx.hosts)>;
             root /var/www/html;
-            index index.php;
             <nginxDefaultLocations(parent, vars)>
-            ## Protect .git files.
-            location ^~ /.git {
-                return 404;
-            }
-            #
-            location / {
-              <nginxRootProxyPassBackendLocationConfig(parent, vars)>
-            }
+            <nginxLocationGitFiles(parent, vars)>
+            <nginxRootProxyPassBackendLocation(parent, vars)>
         }
     }
 
@@ -188,7 +181,7 @@ spec:
           claimName: anrisoftware-com-data
       - name: nginx-config
         configMap:
-          name: gitea-nginx-r2
+          name: gitea-nginx-r3
       <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
       <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
       <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
