@@ -7,12 +7,10 @@
  * vars.postgres.limits.memory
  * vars.postgres.requests.cpu
  * vars.postgres.requests.memory
- * vars.postgres.primaryUser
- * vars.postgres.primaryPassword
  * vars.postgres.user
  * vars.postgres.password
  * vars.postgres.database
- * vars.postgres.rootPassword
+ * vars.postgres.adminPassword
  * vars.rsync.image.name
  * vars.rsync.image.version
  * vars.rsync.limits.cpu
@@ -35,41 +33,10 @@ cc-postgres-deploy-yaml(parent, vars) ::= <<
 
 ---
 
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: permissive-binding
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: User
-  name: admin
-- apiGroup: rbac.authorization.k8s.io
-  kind: User
-  name: kubelet
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: system:serviceaccounts
-
----
-
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: postgres-replica
-  namespace: anrisoftware-com
-  labels:
-    group: anrisoftware-com
-
----
-
 apiVersion: v1
 kind: Secret
 metadata:
-  name: postgres-r1
+  name: postgres-r2
   namespace: anrisoftware-com
   labels:
     app: postgres
@@ -77,22 +44,19 @@ metadata:
     group: anrisoftware-com
 type: Opaque
 data:
-  primary_user: <vars.postgres.primaryUser;format="base64">
-  primary_password: <vars.postgres.primaryPassword;format="base64">
   user: <vars.postgres.user;format="base64">
   password: <vars.postgres.password;format="base64">
   database: <vars.postgres.database;format="base64">
-  root_password: <vars.postgres.rootPassword;format="base64">
+  admin_password: <vars.postgres.adminPassword;format="base64">
 
 ---
 
 kind: Service
 apiVersion: v1
 metadata:
-  name: postgres-set
+  name: postgres
   namespace: anrisoftware-com
   labels:
-    name: postgres-set
     app: postgres
     tier: backend
     group: anrisoftware-com
@@ -102,126 +66,55 @@ spec:
     port: 5432
     targetPort: 5432
   selector:
-    name: postgres-set
-  type: ClusterIP
-  sessionAffinity: None
-
----
-
-kind: Service
-apiVersion: v1
-metadata:
-  name: postgres-primary
-  namespace: anrisoftware-com
-  labels:
-    name: postgres-primary
     app: postgres
-    tier: backend
-    group: anrisoftware-com
-spec:
-  ports:
-  - protocol: TCP
-    port: 5432
-    targetPort: 5432
-    nodePort: 0
-  selector:
-    name: postgres-primary
   type: ClusterIP
-  sessionAffinity: None
-
----
-
-kind: Service
-apiVersion: v1
-metadata:
-  name: postgres-replica
-  namespace: anrisoftware-com
-  labels:
-    name: postgres-replica
-    app: postgres
-    tier: backend
-    group: anrisoftware-com
-spec:
-  ports:
-  - protocol: TCP
-    port: 5432
-    targetPort: 5432
-    nodePort: 0
-  selector:
-    name: postgres-replica
-  type: ClusterIP
-  sessionAffinity: None
 
 ---
 
 apiVersion: apps/v1beta1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: postgres-set
+  name: postgres
   namespace: anrisoftware-com
   labels:
-    name: postgres-set
     app: postgres
     tier: backend
     group: anrisoftware-com
 spec:
-  serviceName: postgres-set
-  replicas: 2
-  updateStrategy:
-    type: OnDelete
+  replicas: 1
   template:
     metadata:
       labels:
         app: postgres
-        name: postgres-replica
+        tier: backend
+        group: anrisoftware-com
     spec:
-      serviceAccount: postgres-replica
-      securityContext:
-        fsGroup: 26
       containers:
       - image: <vars.postgres.image.name>:<vars.postgres.image.version>
-        name: postgres-replica
+        name: postgres
         ports:
         - containerPort: 5432
           name: "postgres"
         env:
-        - name: PGHOST
-          value: "/tmp"
-        - name: PG_MODE
-          value: set
-        - name: PG_PRIMARY_HOST
-          value: postgres-primary
-        - name: PG_PRIMARY_PORT
-          value: '5432'
-        - name: PG_PRIMARY_USER
+        - name: POSTGRESQL_USER
           valueFrom:
             secretKeyRef:
-              name: postgres-r1
-              key: primary_user
-        - name: PG_PRIMARY_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-r1
-              key: primary_password
-        - name: PG_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-r1
+              name: postgres-r2
               key: user
-        - name: PG_PASSWORD
+        - name: POSTGRESQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres-r1
+              name: postgres-r2
               key: password
-        - name: PG_DATABASE
+        - name: POSTGRESQL_DATABASE
           valueFrom:
             secretKeyRef:
-              name: postgres-r1
+              name: postgres-r2
               key: database
-        - name: PG_ROOT_PASSWORD
+        - name: POSTGRESQL_ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres-r1
+              name: postgres-r2
               key: root_password
         resources:
           limits:
@@ -287,7 +180,7 @@ spec:
           exec:
             command:
             - /readiness.sh
-            - /data/postgres-set-0/PG_VERSION
+            - /data/postgres-0/PG_VERSION
           initialDelaySeconds: 5
           timeoutSeconds: 1
         resources:
