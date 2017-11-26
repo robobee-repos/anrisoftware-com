@@ -59,7 +59,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitea-nginx-r3
+  name: gitea-nginx-r4
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -69,6 +69,7 @@ data:
   nginx.conf: |
     <nginxDefaults(parent, vars)>
     http {
+        <nginxHttpDefaults(parent, vars)>
         upstream backend {
             server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.nginx.readTimeout>;
         }
@@ -198,7 +199,7 @@ spec:
           claimName: anrisoftware-com-data
       - name: nginx-config
         configMap:
-          name: gitea-nginx-r3
+          name: gitea-nginx-r4
       <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
       <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
       <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
