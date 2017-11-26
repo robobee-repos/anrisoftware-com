@@ -255,11 +255,12 @@ spec:
               name: gitea-db-r1
               key: database
         command:
-        - "/bin/sh"
-        - "-i"
-        - "-c"
-        - "createuser $POSTGRESQL_USER;"
-        - "createdb --owner=$POSTGRESQL_USER $POSTGRESQL_DATABASE;"
+        - /bin/sh
+        - -i
+        - -c
+        - while ! PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql "postgresql://postgres@${master_fqdn}" -c "SELECT 1;"; do sleep 3; done;
+        - createuser $POSTGRESQL_USER;
+        - createdb --owner=$POSTGRESQL_USER $POSTGRESQL_DATABASE;
         - psql --command "ALTER USER \"${POSTGRESQL_USER}\" WITH ENCRYPTED PASSWORD '${POSTGRESQL_PASSWORD}';"
       restartPolicy: Never
   backoffLimit: 4
