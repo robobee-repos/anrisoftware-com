@@ -59,7 +59,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitea-nginx-r5
+  name: gitea-nginx-r6
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -253,7 +253,7 @@ spec:
           claimName: anrisoftware-com-data
       - name: nginx-config
         configMap:
-          name: gitea-nginx-r5
+          name: gitea-nginx-r6
       <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
       <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
       <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
