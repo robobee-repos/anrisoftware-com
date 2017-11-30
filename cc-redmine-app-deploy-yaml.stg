@@ -184,6 +184,9 @@ spec:
           subPath: redmine_html
         - mountPath: /redmine-in
           name: config
+        - mountPath: "/data"
+          name: data
+          subPath: gitea_data
         livenessProbe:
           tcpSocket:
             port: 3000
