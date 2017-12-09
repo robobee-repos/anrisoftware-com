@@ -79,6 +79,9 @@ spec:
         - mountPath: "/data"
           name: data
           subPath: gitea_data
+        - mountPath: "/html"
+          name: data
+          subPath: gitea_html
       restartPolicy: Always
       volumes:
       - name: data
