@@ -14,9 +14,9 @@
  * vars.redminedb.tolerations[].value
  */
 
-import "maradns_probe.stg"
-import "affinities.stg"
-import "tolerations.stg"
+import "_maradns_probe.stg"
+import "_affinities.stg"
+import "_tolerations.stg"
 
 /*
  *

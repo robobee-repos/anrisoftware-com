@@ -30,10 +30,10 @@
  * vars.redmineapp.tolerations[].value
  */
 
-import "nginx_config.stg"
-import "affinities.stg"
-import "tolerations.stg"
-import "ingress_config.stg"
+import "_nginx_config.stg"
+import "_affinities.stg"
+import "_tolerations.stg"
+import "_ingress_config.stg"
 
 /*
  *
