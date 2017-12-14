@@ -161,7 +161,7 @@ metadata:
     tier: backup
     group: anrisoftware-com
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: rsync-postgres
