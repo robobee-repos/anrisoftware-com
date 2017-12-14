@@ -334,4 +334,75 @@ spec:
 
 ---
 
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: rsync-gitea
+  namespace: anrisoftware-com
+  labels:
+    app: rsync-gitea
+    tier: backup
+    group: anrisoftware-com
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: rsync-gitea
+      tier: backup
+      group: anrisoftware-com
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rsync-gitea
+        tier: backup
+        group: anrisoftware-com
+    spec:
+      containers:
+      - image: <vars.rsync.image.name>:<vars.rsync.image.version>
+        name: rsync-gitea
+        env:
+        - name: RSYNC_AUTHORIZED_KEY
+          valueFrom:
+            secretKeyRef:
+              name: rsync-ssh
+              key: auth-key
+        - name: USER
+          value: "root"
+        ports:
+        - containerPort: 2222
+          name: ssh
+        readinessProbe:
+          exec:
+            command:
+            - /readiness.sh
+            - /data/gitea/conf/app.ini
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: <vars.rsync.limits.cpu>
+            memory: <vars.rsync.limits.memory>
+          requests:
+            cpu: <vars.rsync.requests.cpu>
+            memory: <vars.rsync.requests.memory>
+        volumeMounts:
+        - mountPath: "/data"
+          name: data
+          subPath: gitea_data
+        - mountPath: "/html"
+          name: data
+          subPath: gitea_html
+      restartPolicy: Always
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: anrisoftware-com-data
+      <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
+      <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
+      <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
+
+---
+
 >>
