@@ -81,7 +81,7 @@ metadata:
     tier: backend
     group: anrisoftware-com
 spec:
-  replicas: 0
+  replicas: 1
   template:
     metadata:
       labels:
@@ -161,7 +161,7 @@ metadata:
     tier: backup
     group: anrisoftware-com
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: rsync-postgres
