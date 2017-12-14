@@ -97,7 +97,7 @@ spec:
           name: "postgres"
         env:
         - name: PGCTLTIMEOUT
-          value: 300
+          value: "300"
         - name: POSTGRESQL_USER
           valueFrom:
             secretKeyRef:
