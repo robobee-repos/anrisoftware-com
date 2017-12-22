@@ -8,6 +8,9 @@
  * vars.gitea.requests.cpu
  * vars.gitea.requests.memory
  * vars.gitea.nginx.hosts[]
+ * vars.gitea.postgres.user
+ * vars.gitea.postgres.password
+ * vars.gitea.postgres.database
  * vars.nginx.image.name
  * vars.nginx.image.version
  * vars.nginx.limits.cpu
