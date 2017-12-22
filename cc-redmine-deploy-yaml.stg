@@ -10,8 +10,8 @@
  * vars.redmine.nginx.hosts[]
  * vars.redmine.puma.minThreads
  * vars.redmine.puma.maxThreads
- * vars.redmine.pume.workers
- * vars.redmine.pume.timeout
+ * vars.redmine.puma.workers
+ * vars.redmine.puma.timeout
  * vars.redmine.postgres.user
  * vars.redmine.postgres.password
  * vars.redmine.postgres.database
@@ -230,7 +230,7 @@ spec:
         - name: PUMA_MAX_THREADS
           value: "<vars.redmine.puma.maxThreads>"
         - name: PUMA_CLUSTER_WORKERS
-          value: "<vars.redmine.pume.workers>"
+          value: "<vars.redmine.puma.workers>"
         - name: PUMA_WORKER_TIMEOUT
           value: "<vars.redmine.puma.timeout>"
         - name: PUMA_WORKER_BOOT_TIMEOUT
