@@ -7,6 +7,7 @@
  * vars.redmine.limits.memory
  * vars.redmine.requests.cpu
  * vars.redmine.requests.memory
+ * vars.redmine.start.timeout
  * vars.redmine.nginx.hosts[]
  * vars.redmine.puma.minThreads
  * vars.redmine.puma.maxThreads
@@ -178,25 +179,6 @@ spec:
 
 ---
 
-kind: Service
-apiVersion: v1
-metadata:
-  name: db
-  namespace: anrisoftware-com
-  labels:
-    app: redmine
-    tier: backend
-    group: anrisoftware-com
-spec:
-  ports:
-  - protocol: TCP
-    port: 5432
-    targetPort: 5432
-  selector:
-    app: postgres
-  type: ClusterIP
-
----
 
 apiVersion: apps/v1beta2
 kind: Deployment
@@ -257,7 +239,7 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 3000
-          initialDelaySeconds: 300
+          initialDelaySeconds: <vars.redmine.start.timeout>
           periodSeconds: 60
           timeoutSeconds: 10
         readinessProbe:
@@ -275,7 +257,7 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 8080
-          initialDelaySeconds: 10
+          initialDelaySeconds: <vars.redmine.start.timeout>
           periodSeconds: 60
           timeoutSeconds: 10
         readinessProbe:
@@ -322,8 +304,8 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 5432
-          initialDelaySeconds: 10
-          periodSeconds: 60
+          initialDelaySeconds: <vars.redmine.start.timeout>
+          periodSeconds: 30
           timeoutSeconds: 10
         readinessProbe:
           timeoutSeconds: 3

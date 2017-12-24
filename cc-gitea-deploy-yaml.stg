@@ -7,10 +7,12 @@
  * vars.gitea.limits.memory
  * vars.gitea.requests.cpu
  * vars.gitea.requests.memory
+ * vars.gitea.start.timeout
  * vars.gitea.nginx.hosts[]
  * vars.gitea.postgres.user
  * vars.gitea.postgres.password
  * vars.gitea.postgres.database
+ * vars.postgres.adminPassword
  * vars.nginx.image.name
  * vars.nginx.image.version
  * vars.nginx.limits.cpu
@@ -45,7 +47,7 @@ cc-gitea-deploy-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: Secret
 metadata:
-  name: gitea-db-r1
+  name: gitea-db-r2
   namespace: anrisoftware-com
   labels:
     app: gitea
@@ -56,6 +58,7 @@ data:
   user: <vars.gitea.postgres.user;format="base64">
   password: <vars.gitea.postgres.password;format="base64">
   database: <vars.gitea.postgres.database;format="base64">
+  admin_password: <vars.postgres.adminPassword;format="base64">
 
 ---
 
@@ -118,6 +121,32 @@ data:
       })();
     \</script>
     \<!-- End Piwik Code -->
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitea-pgbouncer-r1
+  namespace: anrisoftware-com
+  labels:
+    app: pgbouncer
+    tier: backend
+    group: anrisoftware-com
+data:
+  pgbouncer.ini: |
+    [databases]
+    <vars.gitea.postgres.database> = host=db port=5432 dbname=<vars.gitea.postgres.database>
+    [pgbouncer]
+    listen_port = 5432
+    listen_addr = 0.0.0.0
+    auth_type = md5
+    auth_file = /pgconf/bouncerconfig/users.txt
+    logfile = /tmp/pgbouncer.log
+    pidfile = /tmp/pgbouncer.pid
+    admin_users = <vars.gitea.postgres.user>
+  users.txt: |
+    "<vars.gitea.postgres.user>" "<vars.gitea.postgres.password>"
 
 ---
 
@@ -226,7 +255,7 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 8080
-          initialDelaySeconds: 10
+          initialDelaySeconds: <vars.gitea.start.timeout>
           periodSeconds: 60
           timeoutSeconds: 10
         readinessProbe:
@@ -249,14 +278,64 @@ spec:
           subPath: gitea_html
         - mountPath: /nginx-in
           name: nginx-config
+      - image: <vars.pgbouncer.image.name>:<vars.pgbouncer.image.version>
+        name: pgbouncer
+        ports:
+        - containerPort: 5432
+          name: "postgres"
+        env:
+        - name: POSTGRESQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: gitea-db-r1
+              key: user
+        - name: POSTGRESQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gitea-db-r1
+              key: password
+        - name: POSTGRESQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: gitea-db-r1
+              key: database
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: <vars.gitea.start.timeout>
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          timeoutSeconds: 3
+          initialDelaySeconds: 5
+          exec:
+            command:
+            - "/bin/sh"
+            - "-i"
+            - "-c"
+            - PGPASSWORD=${POSTGRESQL_PASSWORD}
+            - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c 'SELECT 1'
+        resources:
+          limits:
+            cpu: <vars.pgbouncer.limits.cpu>
+            memory: <vars.pgbouncer.limits.memory>
+          requests:
+            cpu: <vars.pgbouncer.requests.cpu>
+            memory: <vars.pgbouncer.requests.memory>
+        volumeMounts:
+        - mountPath: "/pgconf/bouncerconfig"
+          name: "pgbouncer-config"
       restartPolicy: Always
       volumes:
-      - name: data
+      - name: "data"
         persistentVolumeClaim:
-          claimName: anrisoftware-com-data
-      - name: nginx-config
+          claimName: "anrisoftware-com-data"
+      - name: "nginx-config"
         configMap:
-          name: gitea-nginx-r6
+          name: "gitea-nginx-r6"
+      - name: "pgbouncer-config"
+        configMap:
+          name: "gitea-pgbouncer-r1"
       <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
       <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
       <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
@@ -300,17 +379,17 @@ spec:
         - name: POSTGRESQL_USER
           valueFrom:
             secretKeyRef:
-              name: gitea-db-r1
+              name: gitea-db-r2
               key: user
         - name: POSTGRESQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: gitea-db-r1
+              name: gitea-db-r2
               key: password
         - name: POSTGRESQL_DATABASE
           valueFrom:
             secretKeyRef:
-              name: gitea-db-r1
+              name: gitea-db-r2
               key: database
         - name: POSTGRESQL_ADMIN_PASSWORD
           valueFrom:

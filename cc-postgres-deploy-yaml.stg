@@ -71,6 +71,26 @@ spec:
 
 ---
 
+kind: Service
+apiVersion: v1
+metadata:
+  name: db
+  namespace: anrisoftware-com
+  labels:
+    app: postgres
+    tier: backend
+    group: anrisoftware-com
+spec:
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+  selector:
+    app: postgres
+  type: ClusterIP
+
+---
+
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
