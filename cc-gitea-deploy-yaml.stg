@@ -127,7 +127,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitea-pgbouncer-r1
+  name: gitea-pgbouncer-r2
   namespace: anrisoftware-com
   labels:
     app: pgbouncer
@@ -336,7 +336,7 @@ spec:
           name: "gitea-nginx-r6"
       - name: "pgbouncer-config"
         configMap:
-          name: "gitea-pgbouncer-r1"
+          name: "gitea-pgbouncer-r2"
       <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
       <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
       <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
