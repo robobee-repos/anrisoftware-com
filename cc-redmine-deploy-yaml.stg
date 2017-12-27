@@ -262,6 +262,9 @@ spec:
           timeoutSeconds: 10
         readinessProbe:
           httpGet:
+            httpHeaders:
+            - name: Host
+              value: "<first(vars.redmine.nginx.hosts)>"
             path: /
             port: 8080
           initialDelaySeconds: 60
