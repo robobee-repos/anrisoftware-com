@@ -98,6 +98,8 @@ nginxVirtualHosts(parent, vars, hosts) ::= <<
 redirectHost(host, parent, vars, hosts) ::= <<
 server {
   root /var/www/html;
+  listen 8080;
+  listen [::]:8080;
   server_name <host>;
   return 301 https://<first(hosts)>$request_uri;
 }

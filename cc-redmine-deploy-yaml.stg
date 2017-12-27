@@ -125,7 +125,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-nginx-r10
+  name: redmine-nginx-r11
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -141,8 +141,8 @@ data:
         }
         <nginxVirtualHosts(parent, vars, vars.redmine.nginx.hosts)>
         server {
-            listen 8080 default_server;
-            listen [::]:8080 default_server;
+            listen 8080;
+            listen [::]:8080;
             server_name <first(vars.redmine.nginx.hosts)>;
             root /var/www/html/public;
             index index.php;
@@ -337,7 +337,7 @@ spec:
           name: "redmine-redmine-r1"
       - name: "nginx-config"
         configMap:
-          name: "redmine-nginx-r10"
+          name: "redmine-nginx-r11"
       - name: "pgbouncer-config"
         configMap:
           name: "redmine-pgbouncer-r1"
