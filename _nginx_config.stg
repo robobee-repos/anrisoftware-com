@@ -1,23 +1,73 @@
 /*
+ * Nginx configuration snippets.
+ * 
+ * Example for Redmine:
+ *
+ * import "_nginx_config.stg"
+ * 
+ * cc-redmine-app-deploy-yaml(parent, vars) ::= <<
+ * apiVersion: v1
+ * kind: ConfigMap
+ * metadata:
+ *   name: redmine-nginx-<vars.revision>
+ *   namespace: site-com
+ *   labels:
+ *     app: nginx
+ *     tier: frontend
+ *     group: site-com
+ * data:
+ *   nginx.conf: |
+ *     <nginxDefaults(parent, vars, vars.nginx)>
+ *     http {
+ *         <nginxHttpDefaults(parent, vars, vars.nginx)>
+ *         upstream backend {
+ *             server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.nginx.readTimeout>;
+ *         }
+ *         <nginxVirtualHosts(parent, vars, vars.nginx.hosts)>
+ *         server {
+ *             listen 8080 default_server;
+ *             listen [::]:8080 default_server;
+ *             server_name <first(vars.nginx.hosts)>;
+ *             root /var/www/html/public;
+ *             index index.php;
+ *             <nginxLocationFavicon(parent, vars)>
+ *             <nginxLocationRobots(parent, vars)>
+ *             <nginxLocationHidden(parent, vars)>
+ *             <nginxLocationGitFiles(parent, vars)>
+ *             ## All static files will be served directly.
+ *             location ~* ^(?:(?:help\/)|(?:images\/)|(?:javascripts\/)|(?:plugin_assets\/)|(?:stylesheets\/)|(?:themes\/)).+\.(?:css|js|jpe?g|gif|htc|ico|png|html)$ {
+ *                 <nginxLocationStaticFilesConfig(parent, vars)>
+ *             }
+ *             <nginxRootProxyPassBackendLocation(parent, vars, vars.nginx)>
+ *         }
+ *     }
+ * 
+ * >>
+ */
+
+/*
  * Mandatory:
  *
- * vars.nginx.workerProcesses
- * vars.nginx.workerConnections
+ * nginx.workerProcesses
+ * nginx.workerConnections
  *
  */
-nginxDefaults(parent, vars) ::= <<
-worker_processes <vars.nginx.workerProcesses>;
+nginxDefaults(parent, vars, nginx) ::= <<
+worker_processes <nginx.workerProcesses>;
 error_log /var/log/nginx/error.log warn;
 pid /var/run/nginx.pid;
 events {
-  worker_connections  <vars.nginx.workerConnections>;
+  worker_connections  <nginx.workerConnections>;
 }
 >>
 
 /*
+ * Mandatory:
+ * 
+ * nginx.clientMaxBodySize
  *
  */
-nginxHttpDefaults(parent, vars) ::= <<
+nginxHttpDefaults(parent, vars, nginx) ::= <<
 include /etc/nginx/mime.types;
 default_type application/octet-stream;
 log_format   main '$remote_addr - $remote_user [$time_local]  $status '
@@ -34,15 +84,9 @@ tcp_nopush on;
 tcp_nodelay on;
 keepalive_timeout 65;
 index index.php index.html index.htm;
-client_max_body_size <vars.nginx.clientMaxBodySize>;
+client_max_body_size <nginx.clientMaxBodySize>;
 set_real_ip_from 10.0.0.0/8;
 real_ip_header X-Forwarded-For;
-gzip on;
-gzip_vary on;
-gzip_comp_level 4;
-gzip_min_length 256;
-gzip_proxied expired no-cache no-store private no_last_modified no_etag auth;
-gzip_types application/atom+xml application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
 >>
 
 /*
@@ -70,12 +114,12 @@ add_header X-Permitted-Cross-Domain-Policies none;
 /*
  * Mandatory:
  *
- * vars.nginx.readTimeout
+ * nginx.readTimeout
  *
  */
-nginxRootProxyPassBackendLocationConfig(parent, vars) ::= <<
-proxy_read_timeout      <vars.nginx.readTimeout>;
-proxy_connect_timeout   <vars.nginx.readTimeout>;
+nginxRootProxyPassBackendLocationConfig(parent, vars, nginx) ::= <<
+proxy_read_timeout      <nginx.readTimeout>;
+proxy_connect_timeout   <nginx.readTimeout>;
 proxy_redirect      off;
 proxy_http_version  1.1;
 proxy_set_header    Host $http_host;
@@ -118,10 +162,10 @@ nginxDefaultLocations(parent, vars) ::= <<
 /*
  *
  */
-nginxRootProxyPassBackendLocation(parent, vars) ::= <<
+nginxRootProxyPassBackendLocation(parent, vars, nginx) ::= <<
 #
 location / {
-  <nginxRootProxyPassBackendLocationConfig(parent, vars)>
+  <nginxRootProxyPassBackendLocationConfig(parent, vars, nginx)>
 }
 >>
 

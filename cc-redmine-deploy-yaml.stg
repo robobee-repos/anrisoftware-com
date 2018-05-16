@@ -3,11 +3,8 @@
  *
  * vars.redmine.image.name
  * vars.redmine.image.version
- * vars.redmine.limits.cpu
- * vars.redmine.limits.memory
- * vars.redmine.requests.cpu
- * vars.redmine.requests.memory
- * vars.redmine.start.timeout
+ * vars.redmine.revision
+ * vars.redmine.initialDelaySeconds
  * vars.redmine.nginx.hosts[]
  * vars.redmine.puma.minThreads
  * vars.redmine.puma.maxThreads
@@ -20,32 +17,43 @@
  * vars.postgres.adminPassword
  * vars.nginx.image.name
  * vars.nginx.image.version
+ * vars.nginx.workerProcesses
+ * vars.nginx.workerConnections
+ * vars.nginx.clientMaxBodySize
+ * vars.nginx.readTimeout
+ * vars.pgbouncer.image.name
+ * vars.pgbouncer.image.version
+ * 
+ * Optional:
+ * 
+ * vars.redmine.limits.cpu
+ * vars.redmine.limits.memory
+ * vars.redmine.requests.cpu
+ * vars.redmine.requests.memory
+ * vars.redmine.affinity.key
+ * vars.redmine.affinity.name
+ * vars.redmine.affinity.required
+ * vars.redmine.allowOnMaster
+ * vars.redmine.tolerations[].effect
+ * vars.redmine.tolerations[].key
+ * vars.redmine.tolerations[].value
  * vars.nginx.limits.cpu
  * vars.nginx.limits.memory
  * vars.nginx.requests.cpu
  * vars.nginx.requests.memory
- * vars.nginx.workerProcesses
- * vars.nginx.workerConnections
- * vars.nginx.clientMaxBodySize
- * vars.pgbouncer.image.name
- * vars.pgbouncer.image.version
  * vars.pgbouncer.limits.cpu
  * vars.pgbouncer.limits.memory
  * vars.pgbouncer.requests.cpu
  * vars.pgbouncer.requests.memory
- * 
- * Optional:
- * 
- * vars.redmine.affinityRequired
- * vars.redmine.tolerations[].key
- * vars.redmine.tolerations[].effect
- * vars.redmine.tolerations[].value
  */
 
-import "_nginx_config.stg"
 import "_affinities.stg"
-import "_tolerations.stg"
+import "_cert_config.stg"
 import "_ingress_config.stg"
+import "_nginx_config.stg"
+import "_nginx_probe.stg"
+import "_postgres_probe.stg"
+import "_tolerations.stg"
 
 /*
  *
@@ -57,7 +65,7 @@ cc-redmine-deploy-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: Secret
 metadata:
-  name: redmine-db-r1
+  name: redmine-db-<vars.redmine.revision>
   namespace: anrisoftware-com
   labels:
     app: redmine
@@ -75,7 +83,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-redmine-r1
+  name: redmine-redmine-<vars.redmine.revision>
   namespace: anrisoftware-com
   labels:
     app: redmine
@@ -99,7 +107,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-pgbouncer-r1
+  name: redmine-pgbouncer-<vars.redmine.revision>
   namespace: anrisoftware-com
   labels:
     app: pgbouncer
@@ -125,7 +133,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redmine-nginx-r11
+  name: redmine-nginx-<vars.redmine.revision>
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -133,9 +141,9 @@ metadata:
     group: anrisoftware-com
 data:
   nginx.conf: |
-    <nginxDefaults(parent, vars)>
+    <nginxDefaults(parent, vars, vars.nginx)>
     http {
-        <nginxHttpDefaults(parent, vars)>
+        <nginxHttpDefaults(parent, vars, vars.nginx)>
         upstream backend {
             server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.nginx.readTimeout>;
         }
@@ -154,7 +162,7 @@ data:
             location ~* ^(?:(?:help\/)|(?:images\/)|(?:javascripts\/)|(?:plugin_assets\/)|(?:stylesheets\/)|(?:themes\/)).+\.(?:css|js|jpe?g|gif|htc|ico|png|html)$ {
                 <nginxLocationStaticFilesConfig(parent, vars)>
             }
-            <nginxRootProxyPassBackendLocation(parent, vars)>
+            <nginxRootProxyPassBackendLocation(parent, vars, vars.redmine.nginx)>
         }
     }
 
@@ -220,13 +228,7 @@ spec:
         ports:
         - containerPort: 3000
           name: "http"
-        resources:
-          limits:
-            cpu: <vars.redmine.limits.cpu>
-            memory: <vars.redmine.limits.memory>
-          requests:
-            cpu: <vars.redmine.requests.cpu>
-            memory: <vars.redmine.requests.memory>
+        <resourcesGroup(parent, vars, vars.redmine)>
         volumeMounts:
         - mountPath: "/var/www/html"
           name: "data"
@@ -239,7 +241,7 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 3000
-          initialDelaySeconds: <vars.redmine.start.timeout>
+          initialDelaySeconds: <vars.redmine.initialDelaySeconds>
           periodSeconds: 60
           timeoutSeconds: 10
         readinessProbe:
@@ -254,29 +256,8 @@ spec:
         ports:
         - containerPort: 8080
           name: "http"
-        livenessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: <vars.redmine.start.timeout>
-          periodSeconds: 60
-          timeoutSeconds: 10
-        readinessProbe:
-          httpGet:
-            httpHeaders:
-            - name: Host
-              value: "<first(vars.redmine.nginx.hosts)>"
-            path: /
-            port: 8080
-          initialDelaySeconds: 60
-          periodSeconds: 60
-          timeoutSeconds: 10
-        resources:
-          limits:
-            cpu: <vars.nginx.limits.cpu>
-            memory: <vars.nginx.limits.memory>
-          requests:
-            cpu: <vars.nginx.requests.cpu>
-            memory: <vars.nginx.requests.memory>
+        <nginxReadinessProbe(parent, vars, vars.redmine.nginx.initialDelaySeconds)>
+        <resourcesGroup(parent, vars, vars.nginx)>
         volumeMounts:
         - mountPath: "/var/www/html"
           name: "data"
@@ -307,7 +288,7 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 5432
-          initialDelaySeconds: <vars.redmine.start.timeout>
+          initialDelaySeconds: 10
           periodSeconds: 30
           timeoutSeconds: 10
         readinessProbe:
@@ -320,13 +301,7 @@ spec:
             - "-c"
             - PGPASSWORD=${POSTGRESQL_PASSWORD}
             - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c 'SELECT 1'
-        resources:
-          limits:
-            cpu: <vars.pgbouncer.limits.cpu>
-            memory: <vars.pgbouncer.limits.memory>
-          requests:
-            cpu: <vars.pgbouncer.requests.cpu>
-            memory: <vars.pgbouncer.requests.memory>
+        <resourcesGroup(parent, vars, vars.pgbouncer)>
         volumeMounts:
         - mountPath: "/pgconf/bouncerconfig"
           name: "pgbouncer-config"
@@ -337,35 +312,18 @@ spec:
           claimName: "anrisoftware-com-data"
       - name: "redmine-config"
         configMap:
-          name: "redmine-redmine-r1"
+          name: "redmine-redmine-<vars.redmine.revision>"
       - name: "nginx-config"
         configMap:
-          name: "redmine-nginx-r11"
+          name: "redmine-nginx-<vars.redmine.revision>"
       - name: "pgbouncer-config"
         configMap:
-          name: "redmine-pgbouncer-r1"
-      <affinitiesGroup(parent, vars, vars.redmine.affinityRequired)>
-      <tolerationMaster(parent, vars, vars.redmine.allowOnMaster)>
-      <tolerations(parent, vars, vars.redmine.tolerations, vars.redmine.allowOnMaster)>
+          name: "redmine-pgbouncer-<vars.redmine.revision>"
+<affinitiesGroup(parent, vars, vars.redmine.affinity)>
+<tolerationMasterGroup(parent, vars, vars.redmine.allowOnMaster)>
+<tolerationsGroup(parent, vars, vars.redmine.tolerations, vars.redmine.allowOnMaster)>
 
 ---
-
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: redmine
-  namespace: anrisoftware-com
-  labels:
-    app: redmine
-    tier: frontend
-    group: anrisoftware-com
-  annotations:
-    <ingressDefaultAnnotations(parent, vars, vars.redmine.nginx)>
-spec:
-  <ingressDefaultSpec(parent, vars, vars.redmine.nginx, "redmine")>
-
----
-
 
 apiVersion: batch/v1
 kind: Job
@@ -471,13 +429,7 @@ spec:
             - /data/Rakefile
           initialDelaySeconds: 5
           timeoutSeconds: 1
-        resources:
-          limits:
-            cpu: <vars.rsync.limits.cpu>
-            memory: <vars.rsync.limits.memory>
-          requests:
-            cpu: <vars.rsync.requests.cpu>
-            memory: <vars.rsync.requests.memory>
+        <resourcesGroup(parent, vars, vars.rsync)>
         volumeMounts:
         - mountPath: "/data"
           name: data
@@ -490,9 +442,9 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-      <affinitiesGroup(parent, vars, vars.redmineapp.affinityRequired)>
-      <tolerationMaster(parent, vars, vars.redmineapp.allowOnMaster)>
-      <tolerations(parent, vars, vars.redmineapp.tolerations, vars.redmineapp.allowOnMaster)>
+<affinitiesGroup(parent, vars, vars.redmine.affinity)>
+<tolerationMasterGroup(parent, vars, vars.redmine.allowOnMaster)>
+<tolerationsGroup(parent, vars, vars.redmine.tolerations, vars.redmine.allowOnMaster)>
 
 ---
 

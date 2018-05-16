@@ -3,22 +3,15 @@
  *
  * vars.gitea.image.name
  * vars.gitea.image.version
- * vars.gitea.limits.cpu
- * vars.gitea.limits.memory
- * vars.gitea.requests.cpu
- * vars.gitea.requests.memory
- * vars.gitea.start.timeout
+ * vars.gitea.revision
  * vars.gitea.nginx.hosts[]
  * vars.gitea.postgres.user
  * vars.gitea.postgres.password
  * vars.gitea.postgres.database
+ * vars.gitea.nginx.initialDelaySeconds
  * vars.postgres.adminPassword
  * vars.nginx.image.name
  * vars.nginx.image.version
- * vars.nginx.limits.cpu
- * vars.nginx.limits.memory
- * vars.nginx.requests.cpu
- * vars.nginx.requests.memory
  * vars.nginx.workerProcesses
  * vars.nginx.workerConnections
  * vars.nginx.clientMaxBodySize
@@ -26,16 +19,30 @@
  * 
  * Optional:
  * 
- * vars.gitea.affinityRequired
- * vars.gitea.tolerations[].key
+ * vars.gitea.limits.cpu
+ * vars.gitea.limits.memory
+ * vars.gitea.requests.cpu
+ * vars.gitea.requests.memory
+ * vars.gitea.affinity.key
+ * vars.gitea.affinity.name
+ * vars.gitea.affinity.required
+ * vars.gitea.allowOnMaster
  * vars.gitea.tolerations[].effect
+ * vars.gitea.tolerations[].key
  * vars.gitea.tolerations[].value
+ * vars.nginx.limits.cpu
+ * vars.nginx.limits.memory
+ * vars.nginx.requests.cpu
+ * vars.nginx.requests.memory
  */
 
-import "_nginx_config.stg"
 import "_affinities.stg"
-import "_tolerations.stg"
+import "_cert_config.stg"
 import "_ingress_config.stg"
+import "_nginx_config.stg"
+import "_nginx_probe.stg"
+import "_postgres_probe.stg"
+import "_tolerations.stg"
 
 /*
  *
@@ -47,7 +54,7 @@ cc-gitea-deploy-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: Secret
 metadata:
-  name: gitea-db-r2
+  name: gitea-db-<vars.gitea.revision>
   namespace: anrisoftware-com
   labels:
     app: gitea
@@ -65,7 +72,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitea-nginx-r6
+  name: gitea-nginx-<vars.gitea.revision>
   namespace: anrisoftware-com
   labels:
     app: nginx
@@ -73,9 +80,9 @@ metadata:
     group: anrisoftware-com
 data:
   nginx.conf: |
-    <nginxDefaults(parent, vars)>
+    <nginxDefaults(parent, vars, vars.nginx)>
     http {
-        <nginxHttpDefaults(parent, vars)>
+        <nginxHttpDefaults(parent, vars, vars.nginx)>
         upstream backend {
             server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.nginx.readTimeout>;
         }
@@ -89,7 +96,7 @@ data:
             <nginxLocationRobots(parent, vars)>
             <nginxLocationHidden(parent, vars)>
             <nginxLocationGitFiles(parent, vars)>
-            <nginxRootProxyPassBackendLocation(parent, vars)>
+            <nginxRootProxyPassBackendLocation(parent, vars, vars.nginx)>
         }
     }
 
@@ -98,7 +105,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitea-env-r2
+  name: gitea-env-<vars.gitea.revision>
   namespace: anrisoftware-com
   labels:
     app: gitea
@@ -127,7 +134,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitea-pgbouncer-r2
+  name: gitea-pgbouncer-<vars.gitea.revision>
   namespace: anrisoftware-com
   labels:
     app: pgbouncer
@@ -221,20 +228,14 @@ spec:
         - name: PIWIK_JAVASCRIPT
           valueFrom:
             configMapKeyRef:
-              name: gitea-env-r2
+              name: gitea-env-<vars.gitea.revision>
               key: piwik_javascript
         ports:
         - containerPort: 22
           name: "ssh"
         - containerPort: 3000
           name: "gitea"
-        resources:
-          limits:
-            cpu: <vars.gitea.limits.cpu>
-            memory: <vars.gitea.limits.memory>
-          requests:
-            cpu: <vars.gitea.requests.cpu>
-            memory: <vars.gitea.requests.memory>
+        <resourcesGroup(parent, vars, vars.gitea)>
         volumeMounts:
         - mountPath: "/data"
           name: data
@@ -256,7 +257,7 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 8080
-          initialDelaySeconds: <vars.gitea.start.timeout>
+          initialDelaySeconds: <vars.gitea.nginx.initialDelaySeconds>
           periodSeconds: 60
           timeoutSeconds: 10
         readinessProbe:
@@ -266,13 +267,7 @@ spec:
           initialDelaySeconds: 60
           periodSeconds: 60
           timeoutSeconds: 10
-        resources:
-          limits:
-            cpu: <vars.nginx.limits.cpu>
-            memory: <vars.nginx.limits.memory>
-          requests:
-            cpu: <vars.nginx.requests.cpu>
-            memory: <vars.nginx.requests.memory>
+        <resourcesGroup(parent, vars, vars.nginx)>
         volumeMounts:
         - mountPath: "/var/www/html"
           name: data
@@ -303,7 +298,7 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 5432
-          initialDelaySeconds: <vars.gitea.start.timeout>
+          initialDelaySeconds: 10
           periodSeconds: 60
           timeoutSeconds: 10
         readinessProbe:
@@ -316,13 +311,7 @@ spec:
             - "-c"
             - PGPASSWORD=${POSTGRESQL_PASSWORD}
             - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c 'SELECT 1'
-        resources:
-          limits:
-            cpu: <vars.pgbouncer.limits.cpu>
-            memory: <vars.pgbouncer.limits.memory>
-          requests:
-            cpu: <vars.pgbouncer.requests.cpu>
-            memory: <vars.pgbouncer.requests.memory>
+        <resourcesGroup(parent, vars, vars.pgbouncer)>
         volumeMounts:
         - mountPath: "/pgconf/bouncerconfig"
           name: "pgbouncer-config"
@@ -333,29 +322,13 @@ spec:
           claimName: "anrisoftware-com-data"
       - name: "nginx-config"
         configMap:
-          name: "gitea-nginx-r6"
+          name: "gitea-nginx-<vars.gitea.revision>"
       - name: "pgbouncer-config"
         configMap:
-          name: "gitea-pgbouncer-r2"
-      <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
-      <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
-      <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
-
----
-
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: gitea
-  namespace: anrisoftware-com
-  labels:
-    app: gitea
-    tier: frontend
-    group: anrisoftware-com
-  annotations:
-    <ingressDefaultAnnotations(parent, vars, vars.gitea.nginx)>
-spec:
-  <ingressDefaultSpec(parent, vars, vars.gitea.nginx, "gitea")>
+          name: "gitea-pgbouncer-<vars.gitea.revision>"
+<affinitiesGroup(parent, vars, vars.gitea.affinity)>
+<tolerationMasterGroup(parent, vars, vars.gitea.allowOnMaster)>
+<tolerationsGroup(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
 
 ---
 
@@ -380,17 +353,17 @@ spec:
         - name: POSTGRESQL_USER
           valueFrom:
             secretKeyRef:
-              name: gitea-db-r2
+              name: gitea-db-<vars.gitea.revision>
               key: user
         - name: POSTGRESQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: gitea-db-r2
+              name: gitea-db-<vars.gitea.revision>
               key: password
         - name: POSTGRESQL_DATABASE
           valueFrom:
             secretKeyRef:
-              name: gitea-db-r2
+              name: gitea-db-<vars.gitea.revision>
               key: database
         - name: POSTGRESQL_ADMIN_PASSWORD
           valueFrom:
@@ -463,13 +436,7 @@ spec:
             - /data/gitea/conf/app.ini
           initialDelaySeconds: 5
           timeoutSeconds: 1
-        resources:
-          limits:
-            cpu: <vars.rsync.limits.cpu>
-            memory: <vars.rsync.limits.memory>
-          requests:
-            cpu: <vars.rsync.requests.cpu>
-            memory: <vars.rsync.requests.memory>
+        <resourcesGroup(parent, vars, vars.rsync)>
         volumeMounts:
         - mountPath: "/data"
           name: data
@@ -482,9 +449,9 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-      <affinitiesGroup(parent, vars, vars.gitea.affinityRequired)>
-      <tolerationMaster(parent, vars, vars.gitea.allowOnMaster)>
-      <tolerations(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
+<affinitiesGroup(parent, vars, vars.gitea.affinity)>
+<tolerationMasterGroup(parent, vars, vars.gitea.allowOnMaster)>
+<tolerationsGroup(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
 
 ---
 

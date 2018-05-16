@@ -3,30 +3,36 @@
  *
  * vars.postgres.image.name
  * vars.postgres.image.version
- * vars.postgres.limits.cpu
- * vars.postgres.limits.memory
- * vars.postgres.requests.cpu
- * vars.postgres.requests.memory
  * vars.postgres.user
  * vars.postgres.password
  * vars.postgres.database
  * vars.postgres.adminPassword
+ * vars.postgres.revision
  * vars.rsync.image.name
  * vars.rsync.image.version
+ * 
+ * Optional:
+ * 
+ * vars.postgres.limits.cpu
+ * vars.postgres.limits.memory
+ * vars.postgres.requests.cpu
+ * vars.postgres.requests.memory
+ * vars.postgres.affinity.key
+ * vars.postgres.affinity.name
+ * vars.postgres.affinity.required
+ * vars.postgres.allowOnMaster
+ * vars.postgres.tolerations[].effect
+ * vars.postgres.tolerations[].key
+ * vars.postgres.tolerations[].value
  * vars.rsync.limits.cpu
  * vars.rsync.limits.memory
  * vars.rsync.requests.cpu
  * vars.rsync.requests.memory
- * 
- * Optional:
- * 
- * vars.postgres.affinityRequired
- * vars.postgres.tolerations[].key
- * vars.postgres.tolerations[].effect
- * vars.postgres.tolerations[].value
  */
 
 import "_affinities.stg"
+import "_postgres_probe.stg"
+import "_resources.stg"
 import "_tolerations.stg"
 
 cc-postgres-deploy-yaml(parent, vars) ::= <<
@@ -36,7 +42,7 @@ cc-postgres-deploy-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: Secret
 metadata:
-  name: postgres-r2
+  name: postgres-<vars.postgres.revision>
   namespace: anrisoftware-com
   labels:
     app: postgres
@@ -121,44 +127,25 @@ spec:
         - name: POSTGRESQL_USER
           valueFrom:
             secretKeyRef:
-              name: postgres-r2
+              name: postgres-<vars.postgres.revision>
               key: user
         - name: POSTGRESQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres-r2
+              name: postgres-<vars.postgres.revision>
               key: password
         - name: POSTGRESQL_DATABASE
           valueFrom:
             secretKeyRef:
-              name: postgres-r2
+              name: postgres-<vars.postgres.revision>
               key: database
         - name: POSTGRESQL_ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres-r2
+              name: postgres-<vars.postgres.revision>
               key: admin_password
-        resources:
-          limits:
-            cpu: <vars.postgres.limits.cpu>
-            memory: <vars.postgres.limits.memory>
-          requests:
-            cpu: <vars.postgres.requests.cpu>
-            memory: <vars.postgres.requests.memory>
-        readinessProbe:
-          timeoutSeconds: 3
-          initialDelaySeconds: 5
-          exec:
-            command:
-            - "/bin/sh"
-            - "-i"
-            - "-c"
-            - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c 'SELECT 1'
-        livenessProbe:
-          timeoutSeconds: 1
-          initialDelaySeconds: 300
-          tcpSocket:
-            port: 5432
+        <resourcesGroup(parent, vars, vars.postgres)>
+        <postgresReadinessProbe(parent, vars)>
         volumeMounts:
         - name: pgdata
           mountPath: "/var/lib/pgsql/data"
@@ -167,9 +154,9 @@ spec:
       - name: pgdata
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-      <affinitiesGroup(parent, vars, vars.postgres.affinityRequired)>
-      <tolerationMaster(parent, vars, vars.postgres.allowOnMaster)>
-      <tolerations(parent, vars, vars.postgres.tolerations, vars.postgres.allowOnMaster)>
+<affinitiesGroup(parent, vars, vars.postgres.affinity)>
+<tolerationMasterGroup(parent, vars, vars.postgres.allowOnMaster)>
+<tolerationsGroup(parent, vars, vars.postgres.tolerations, vars.postgres.allowOnMaster)>
 
 ---
 
@@ -219,13 +206,7 @@ spec:
             - /data/userdata/PG_VERSION
           initialDelaySeconds: 5
           timeoutSeconds: 1
-        resources:
-          limits:
-            cpu: <vars.rsync.limits.cpu>
-            memory: <vars.rsync.limits.memory>
-          requests:
-            cpu: <vars.rsync.requests.cpu>
-            memory: <vars.rsync.requests.memory>
+        <resourcesGroup(parent, vars, vars.rsync)>
         volumeMounts:
         - mountPath: "/data"
           subPath: "pgdata"
@@ -235,9 +216,9 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-      <affinitiesGroup(parent, vars, vars.postgres.affinityRequired)>
-      <tolerationMaster(parent, vars, vars.postgres.allowOnMaster)>
-      <tolerations(parent, vars, vars.postgres.tolerations, vars.postgres.allowOnMaster)>
+<affinitiesGroup(parent, vars, vars.postgres.affinity)>
+<tolerationMasterGroup(parent, vars, vars.postgres.allowOnMaster)>
+<tolerationsGroup(parent, vars, vars.postgres.tolerations, vars.postgres.allowOnMaster)>
 
 ---
 

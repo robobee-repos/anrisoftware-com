@@ -1,0 +1,43 @@
+/*
+ * Mandatory:
+ *
+ * vars.redmine.nginx.hosts[]
+ * vars.nginx.clientMaxBodySize
+ *
+ */
+
+import "_cert_config.stg"
+import "_ingress_config.stg"
+
+/*
+ * 
+ */
+xx-redmine-ingress-yaml(parent, vars) ::= <<
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: redmine-anrisoftware-com
+  namespace: anrisoftware-com
+  labels:
+    app: redmine
+    tier: frontend
+    deployment: redmine
+  annotations:
+    <ingressDefaultAnnotations(parent, vars, vars.redmine.nginx)>
+spec:
+  <ingressDefaultSpec(parent, vars, vars.redmine.nginx, "redmine-anrisoftware-com")>
+
+---
+
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: redmine-anrisoftware-com
+  namespace: anrisoftware-com
+spec:
+  <certDefaultSpecProd(parent, vars, vars.redmine.nginx, "redmine-anrisoftware-com")>
+
+---
+>>
