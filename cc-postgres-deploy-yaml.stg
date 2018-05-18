@@ -10,6 +10,7 @@
  * vars.postgres.revision
  * vars.rsync.image.name
  * vars.rsync.image.version
+ * vars.rsync.ssh.revision
  * 
  * Optional:
  * 
@@ -192,10 +193,12 @@ spec:
         - name: RSYNC_AUTHORIZED_KEY
           valueFrom:
             secretKeyRef:
-              name: rsync-ssh
+              name: rsync-ssh-<vars.rsync.ssh.revision>
               key: auth-key
         - name: USER
           value: "root"
+        - name: RSYNC_STRICT_HOST_KEY_CHECKING_NO
+          value: "true"
         ports:
         - containerPort: 2222
           name: ssh

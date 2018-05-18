@@ -18,4 +18,5 @@ spec:
   resources:
     requests:
       storage: <vars.volumes.data.storage>
+
 >>
