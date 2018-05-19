@@ -247,7 +247,7 @@ spec:
         readinessProbe:
           tcpSocket:
             port: 3000
-          initialDelaySeconds: 60
+          initialDelaySeconds: <vars.gitea.initialDelaySeconds>
           periodSeconds: 60
           timeoutSeconds: 10
       - image: <vars.nginx.image.name>:<vars.nginx.image.version>
@@ -258,7 +258,7 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 8080
-          initialDelaySeconds: <vars.gitea.nginx.initialDelaySeconds>
+          initialDelaySeconds: <vars.gitea>
           periodSeconds: 60
           timeoutSeconds: 10
         readinessProbe:
