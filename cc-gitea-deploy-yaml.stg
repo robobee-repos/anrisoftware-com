@@ -66,7 +66,7 @@ data:
   user: <vars.gitea.postgres.user;format="base64">
   password: <vars.gitea.postgres.password;format="base64">
   database: <vars.gitea.postgres.database;format="base64">
-  admin_password: <vars.postgres.adminPassword;format="base64">
+  admin_password: <vars.postgres.password;format="base64">
 
 ---
 
@@ -357,7 +357,7 @@ spec:
         - name: POSTGRESQL_ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres-r2
+              name: gitea-db-<vars.gitea.revision>
               key: admin_password
         - name: PGHOST
           value: "postgres"

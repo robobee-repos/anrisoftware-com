@@ -6,7 +6,6 @@
  * vars.postgres.user
  * vars.postgres.password
  * vars.postgres.database
- * vars.postgres.adminPassword
  * vars.postgres.revision
  * vars.rsync.image.name
  * vars.rsync.image.version

@@ -76,7 +76,7 @@ data:
   user: <vars.redmine.postgres.user;format="base64">
   password: <vars.redmine.postgres.password;format="base64">
   database: <vars.redmine.postgres.database;format="base64">
-  admin_password: <vars.postgres.adminPassword;format="base64">
+  admin_password: <vars.postgres.password;format="base64">
 
 ---
 
@@ -346,22 +346,22 @@ spec:
         - name: POSTGRESQL_USER
           valueFrom:
             secretKeyRef:
-              name: redmine-db-r1
+              name: redmine-db-<vars.redmine.revision>
               key: user
         - name: POSTGRESQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: redmine-db-r1
+              name: redmine-db-<vars.redmine.revision>
               key: password
         - name: POSTGRESQL_DATABASE
           valueFrom:
             secretKeyRef:
-              name: redmine-db-r1
+              name: redmine-db-<vars.redmine.revision>
               key: database
         - name: POSTGRESQL_ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: redmine-db-r1
+              name: redmine-db-<vars.redmine.revision>
               key: admin_password
         - name: PGHOST
           value: "postgres"
