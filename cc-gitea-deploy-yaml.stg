@@ -9,7 +9,7 @@
  * vars.gitea.postgres.password
  * vars.gitea.postgres.database
  * vars.gitea.nginx.initialDelaySeconds
- * vars.postgres.adminPassword
+ * vars.postgres.password
  * vars.nginx.image.name
  * vars.nginx.image.version
  * vars.nginx.workerProcesses

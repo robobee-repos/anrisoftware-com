@@ -54,7 +54,6 @@ data:
   user: <vars.postgres.user;format="base64">
   password: <vars.postgres.password;format="base64">
   database: <vars.postgres.database;format="base64">
-  admin_password: <vars.postgres.adminPassword;format="base64">
 
 ---
 
@@ -125,26 +124,21 @@ spec:
         env:
         - name: PGCTLTIMEOUT
           value: "300"
-        - name: POSTGRESQL_USER
+        - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
               name: postgres-<vars.postgres.revision>
               key: user
-        - name: POSTGRESQL_PASSWORD
+        - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: postgres-<vars.postgres.revision>
               key: password
-        - name: POSTGRESQL_DATABASE
+        - name: POSTGRES_DB
           valueFrom:
             secretKeyRef:
               name: postgres-<vars.postgres.revision>
               key: database
-        - name: POSTGRESQL_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-<vars.postgres.revision>
-              key: admin_password
         <resourcesGroup(parent, vars, vars.postgres)>
         <postgresReadinessProbe(parent, vars)>
         volumeMounts:

@@ -14,7 +14,7 @@
  * vars.redmine.postgres.password
  * vars.redmine.postgres.database
  * vars.redmine.postgres.schema
- * vars.postgres.adminPassword
+ * vars.postgres.password
  * vars.nginx.image.name
  * vars.nginx.image.version
  * vars.nginx.workerProcesses
