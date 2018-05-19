@@ -256,7 +256,7 @@ spec:
         ports:
         - containerPort: 8080
           name: "http"
-        <nginxReadinessProbe(parent, vars, vars.redmine.initialDelaySeconds)>
+        <nginxReadinessProbe(parent, vars, vars.redmine)>
         <resourcesGroup(parent, vars, vars.nginx)>
         volumeMounts:
         - mountPath: "/var/www/html"
