@@ -142,7 +142,7 @@ spec:
         <postgresReadinessProbe(parent, vars)>
         volumeMounts:
         - name: pgdata
-          mountPath: "/var/lib/pgsql/data"
+          mountPath: "/var/lib/postgresql/data"
           subPath: "pgdata"
       volumes:
       - name: pgdata
@@ -199,7 +199,7 @@ spec:
           exec:
             command:
             - /readiness.sh
-            - /data/userdata/PG_VERSION
+            - /var/lib/postgresql/data/PG_VERSION
           initialDelaySeconds: 5
           timeoutSeconds: 1
         <resourcesGroup(parent, vars, vars.rsync)>
