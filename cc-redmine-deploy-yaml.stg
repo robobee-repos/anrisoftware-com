@@ -162,7 +162,7 @@ data:
             location ~* ^(?:(?:help\/)|(?:images\/)|(?:javascripts\/)|(?:plugin_assets\/)|(?:stylesheets\/)|(?:themes\/)).+\.(?:css|js|jpe?g|gif|htc|ico|png|html)$ {
                 <nginxLocationStaticFilesConfig(parent, vars)>
             }
-            <nginxRootProxyPassBackendLocation(parent, vars, vars.redmine.nginx)>
+            <nginxRootProxyPassBackendLocation(parent, vars, vars.nginx)>
         }
     }
 
