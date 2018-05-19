@@ -255,19 +255,7 @@ spec:
         ports:
         - containerPort: 8080
           name: "http"
-        livenessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: <vars.gitea>
-          periodSeconds: 60
-          timeoutSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 60
-          periodSeconds: 60
-          timeoutSeconds: 10
+        <nginxReadinessProbe(parent, vars, vars.gitea)>
         <resourcesGroup(parent, vars, vars.nginx)>
         volumeMounts:
         - mountPath: "/var/www/html"
