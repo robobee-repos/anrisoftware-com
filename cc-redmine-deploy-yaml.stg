@@ -377,7 +377,7 @@ spec:
           while ! PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql "postgresql://postgres@postgres" -c "SELECT 1;"; do sleep 3; done;
           PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} createuser $POSTGRESQL_USER ;
           PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} createdb --owner=$POSTGRESQL_USER $POSTGRESQL_DATABASE ;
-          PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql --command "ALTER USER \"${POSTGRESQL_USER}\" WITH ENCRYPTED PASSWORD '${POSTGRESQL_PASSWORD}'; CREATE SCHEMA anrisprojects;"
+          PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql "postgresql://${POSTGRESQL_USER}@postgres" -c "ALTER USER \"${POSTGRESQL_USER}\" WITH ENCRYPTED PASSWORD '${POSTGRESQL_PASSWORD}'; CREATE SCHEMA anrisprojects;"
       restartPolicy: Never
   backoffLimit: 4
 
