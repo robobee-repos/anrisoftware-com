@@ -31,9 +31,6 @@ livenessProbe:
   timeoutSeconds: 10
 readinessProbe:
   httpGet:
-    httpHeaders:
-    - name: Host
-      value: "<first(nginx.hosts)>"
     path: /
     port: 8080
   initialDelaySeconds: 60
