@@ -41,7 +41,7 @@ spec:
 
 ---
 
-<ingressService(parent, vars, "anrisoftware-com", "gitea", "gitea-anrisoftware-com">
+<ingressService(parent, vars, "anrisoftware-com", "gitea", "gitea-anrisoftware-com")>
 
 ---
 

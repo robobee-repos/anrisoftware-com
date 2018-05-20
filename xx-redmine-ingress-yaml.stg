@@ -41,7 +41,7 @@ spec:
 
 ---
 
-<ingressService(parent, vars, "anrisoftware-com", "redmine", "redmine-anrisoftware-com">
+<ingressService(parent, vars, "anrisoftware-com", "redmine", "redmine-anrisoftware-com")>
 
 ---
 
