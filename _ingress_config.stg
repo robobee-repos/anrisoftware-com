@@ -18,7 +18,7 @@
  *   annotations:
  *     <ingressDefaultAnnotations(parent, vars, vars.site.nginx)>
  * spec:
- *   <ingressDefaultSpec(parent, vars, vars.nginx, "site-com")>
+ *   <ingressDefaultSpec(parent, vars, vars.nginx, "wordpress")>
  * 
  */
 
@@ -34,7 +34,7 @@ nginx.ingress.kubernetes.io/affinity: "cookie"
 nginx.ingress.kubernetes.io/session-cookie-name: "route"
 nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
 nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
-nginx.org/client-max-body-size: "nginx.clientMaxBodySize"
+nginx.org/client-max-body-size: "<nginx.clientMaxBodySize>"
 >>
 
 /*

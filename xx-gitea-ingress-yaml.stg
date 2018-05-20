@@ -25,9 +25,9 @@ metadata:
     tier: frontend
     deployment: gitea
   annotations:
-    <ingressDefaultAnnotations(parent, vars, vars.gitea.nginx)>
+    <ingressDefaultAnnotations(parent, vars, vars.nginx)>
 spec:
-  <ingressDefaultSpec(parent, vars, vars.gitea.nginx, "gitea-anrisoftware-com")>
+  <ingressDefaultSpec(parent, vars, vars.gitea.nginx, "gitea")>
 
 ---
 

@@ -25,9 +25,9 @@ metadata:
     tier: frontend
     deployment: redmine
   annotations:
-    <ingressDefaultAnnotations(parent, vars, vars.redmine.nginx)>
+    <ingressDefaultAnnotations(parent, vars, vars.nginx)>
 spec:
-  <ingressDefaultSpec(parent, vars, vars.redmine.nginx, "redmine-anrisoftware-com")>
+  <ingressDefaultSpec(parent, vars, vars.redmine.nginx, "redmine")>
 
 ---
 
