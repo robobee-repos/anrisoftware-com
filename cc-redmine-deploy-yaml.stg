@@ -241,7 +241,7 @@ spec:
             secretKeyRef:
               name: redmine-db-<vars.redmine.revision>
               key: password
-        - name: REDMINE_PLUGINS_MIGRATE:
+        - name: REDMINE_PLUGINS_MIGRATE
           value: "true"
         ports:
         - containerPort: 3000
