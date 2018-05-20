@@ -61,3 +61,28 @@ hostRule(host, name) ::= <<
         serviceName: <name>
         servicePort: 8080
 >>
+
+/*
+ * Mandatory:
+ *
+ */
+ingressService(parent, vars, namespace, app, name) ::= <<
+apiVersion: v1
+kind: Service
+metadata:
+  name: <name>
+  namespace: <namespace>
+  labels:
+    app: <app>
+    tier: frontend
+    group: <namespace>
+spec:
+  ports:
+  - name: "http"
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: <app>
+
+>>
+

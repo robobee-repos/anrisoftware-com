@@ -27,7 +27,7 @@ metadata:
   annotations:
     <ingressDefaultAnnotations(parent, vars, vars.nginx)>
 spec:
-  <ingressDefaultSpec(parent, vars, vars.redmine.nginx, "redmine")>
+  <ingressDefaultSpec(parent, vars, vars.redmine.nginx, "redmine-anrisoftware-com")>
 
 ---
 
@@ -40,4 +40,9 @@ spec:
   <certDefaultSpecProd(parent, vars, vars.redmine.nginx, "redmine-anrisoftware-com")>
 
 ---
+
+<ingressService(parent, vars, "anrisoftware-com", "redmine", "redmine-anrisoftware-com">
+
+---
+
 >>
