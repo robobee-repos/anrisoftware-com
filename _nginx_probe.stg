@@ -39,9 +39,12 @@ readinessProbe:
   timeoutSeconds: 10
 >>
 
-httpHeaders(headers) ::= <%
-<headers:httpHeader()>
-%>
+httpHeaders(headers) ::= <<
+<if(headers)>
+httpHeaders:
+  <headers:httpHeader()>
+<endif>
+>>
 
 httpHeader(header) ::= <<
 - name: <header.name>
