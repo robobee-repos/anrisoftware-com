@@ -226,17 +226,17 @@ spec:
           value: "<vars.redmine.puma.timeout>"
         - name: REDMINE_DB_POSTGRES
           value: "db"
-        - name: REDMINE_DB_USERNAME:
+        - name: REDMINE_DB_USERNAME
           valueFrom:
             secretKeyRef:
               name: redmine-db-<vars.redmine.revision>
               key: user
-        - name: REDMINE_DB_DATABASE:
+        - name: REDMINE_DB_DATABASE
           valueFrom:
             secretKeyRef:
               name: redmine-db-<vars.redmine.revision>
               key: database
-        - name: REDMINE_DB_PASSWORD:
+        - name: REDMINE_DB_PASSWORD
           valueFrom:
             secretKeyRef:
               name: redmine-db-<vars.redmine.revision>
@@ -291,17 +291,17 @@ spec:
         - name: POSTGRESQL_USER
           valueFrom:
             secretKeyRef:
-              name: redmine-db-r1
+              name: redmine-db-<vars.redmine.revision>
               key: user
         - name: POSTGRESQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: redmine-db-r1
+              name: redmine-db-<vars.redmine.revision>
               key: password
         - name: POSTGRESQL_DATABASE
           valueFrom:
             secretKeyRef:
-              name: redmine-db-r1
+              name: redmine-db-<vars.redmine.revision>
               key: database
         livenessProbe:
           tcpSocket:
