@@ -224,6 +224,25 @@ spec:
           value: "<vars.redmine.puma.timeout>"
         - name: PUMA_WORKER_BOOT_TIMEOUT
           value: "<vars.redmine.puma.timeout>"
+        - name: REDMINE_DB_POSTGRES
+          value: "db"
+        - name: REDMINE_DB_USERNAME:
+          valueFrom:
+            secretKeyRef:
+              name: redmine-db-<vars.redmine.revision>
+              key: user
+        - name: REDMINE_DB_DATABASE:
+          valueFrom:
+            secretKeyRef:
+              name: redmine-db-<vars.redmine.revision>
+              key: database
+        - name: REDMINE_DB_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: redmine-db-<vars.redmine.revision>
+              key: password
+        - name: REDMINE_PLUGINS_MIGRATE:
+          value: "true"
         ports:
         - containerPort: 3000
           name: "http"

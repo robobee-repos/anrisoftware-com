@@ -272,17 +272,17 @@ spec:
         - name: POSTGRESQL_USER
           valueFrom:
             secretKeyRef:
-              name: gitea-db-r1
+              name: gitea-db-<vars.redmine.revision>
               key: user
         - name: POSTGRESQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: gitea-db-r1
+              name: gitea-db-<vars.redmine.revision>
               key: password
         - name: POSTGRESQL_DATABASE
           valueFrom:
             secretKeyRef:
-              name: gitea-db-r1
+              name: gitea-db-<vars.redmine.revision>
               key: database
         livenessProbe:
           tcpSocket:
