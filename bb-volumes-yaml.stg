@@ -4,6 +4,10 @@
  * vars.volumes.data.storage
  *
  */
+
+/*
+ * 
+ */
 bb-volumes-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: PersistentVolumeClaim

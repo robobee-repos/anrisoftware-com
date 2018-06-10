@@ -23,6 +23,9 @@
  * vars.nginx.readTimeout
  * vars.pgbouncer.image.name
  * vars.pgbouncer.image.version
+ * vars.rsync.image.name
+ * vars.rsync.image.version
+ * vars.rsync.ssh.revision
  * 
  * Optional:
  * 
@@ -45,6 +48,10 @@
  * vars.pgbouncer.limits.memory
  * vars.pgbouncer.requests.cpu
  * vars.pgbouncer.requests.memory
+ * vars.rsync.limits.cpu
+ * vars.rsync.limits.memory
+ * vars.rsync.requests.cpu
+ * vars.rsync.requests.memory
  */
 
 import "robobeerun-templates/_affinities.stg"
