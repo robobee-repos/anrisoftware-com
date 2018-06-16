@@ -1,0 +1,325 @@
+/*
+ * Mandatory:
+ *
+ * vars.archiva.storage
+ * vars.archiva.image.name
+ * vars.archiva.image.version
+ * vars.archiva.revision
+ * vars.archiva.initialDelaySeconds
+ * vars.archiva.nginx.hosts[]
+ * vars.archiva.puma.minThreads
+ * vars.archiva.puma.maxThreads
+ * vars.archiva.puma.workers
+ * vars.archiva.puma.timeout
+ * vars.archiva.postgres.user
+ * vars.archiva.postgres.password
+ * vars.archiva.postgres.database
+ * vars.archiva.postgres.schema
+ * vars.nginx.image.name
+ * vars.nginx.image.version
+ * vars.nginx.workerProcesses
+ * vars.nginx.workerConnections
+ * vars.nginx.clientMaxBodySize
+ * vars.nginx.readTimeout
+ * vars.rsync.image.name
+ * vars.rsync.image.version
+ * vars.rsync.ssh.revision
+ * 
+ * Optional:
+ * 
+ * vars.archiva.limits.cpu
+ * vars.archiva.limits.memory
+ * vars.archiva.requests.cpu
+ * vars.archiva.requests.memory
+ * vars.archiva.affinity.key
+ * vars.archiva.affinity.name
+ * vars.archiva.affinity.required
+ * vars.archiva.allowOnMaster
+ * vars.archiva.tolerations[].effect
+ * vars.archiva.tolerations[].key
+ * vars.archiva.tolerations[].value
+ * vars.nginx.limits.cpu
+ * vars.nginx.limits.memory
+ * vars.nginx.requests.cpu
+ * vars.nginx.requests.memory
+ * vars.rsync.limits.cpu
+ * vars.rsync.limits.memory
+ * vars.rsync.requests.cpu
+ * vars.rsync.requests.memory
+ */
+
+import "robobeerun-templates/_affinities.stg"
+import "robobeerun-templates/_nginx_config.stg"
+import "robobeerun-templates/_nginx_probe.stg"
+import "robobeerun-templates/_tolerations.stg"
+import "robobeerun-templates/_resources.stg"
+
+/*
+ *
+ */
+cc-archiva-deploy-yaml(parent, vars) ::= <<
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: archiva-nginx-<vars.archiva.revision>
+  namespace: anrisoftware-com
+  labels:
+    app: nginx
+    tier: frontend
+    group: anrisoftware-com
+data:
+  nginx.conf: |
+    <nginxDefaults(parent, vars, vars.nginx)>
+    http {
+        <nginxHttpDefaults(parent, vars, vars.nginx)>
+        upstream backend {
+            server 127.0.0.1:8000 max_fails=3 fail_timeout=<vars.nginx.readTimeout>;
+        }
+        <nginxVirtualHosts(parent, vars, vars.archiva.nginx.hosts)>
+        server {
+            listen 8080;
+            listen [::]:8080;
+            server_name <first(vars.archiva.nginx.hosts)>;
+            root /var/www/html/apps/archiva;
+            index index.php;
+            <nginxLocationFavicon(parent, vars)>
+            <nginxLocationRobots(parent, vars)>
+            <nginxLocationHidden(parent, vars)>
+            <nginxLocationStaticFiles(parent, vars)>
+            <nginxRootProxyPassBackendLocation(parent, vars, vars.nginx)>
+        }
+    }
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: archiva
+  namespace: anrisoftware-com
+  labels:
+    app: archiva
+    tier: frontend
+    group: anrisoftware-com
+spec:
+  ports:
+  - name: "http"
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: archiva
+
+---
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: archiva
+  namespace: anrisoftware-com
+  labels:
+    app: archiva
+    tier: frontend
+    group: anrisoftware-com
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: archiva
+      tier: frontend
+      group: anrisoftware-com
+  template:
+    metadata:
+      labels:
+        app: archiva
+        tier: frontend
+        group: anrisoftware-com
+    spec:
+      containers:
+      - image: <vars.archiva.image.name>:<vars.archiva.image.version>
+        name: archiva
+        env:
+        - name: ARCHIVA_JETTY_PORT
+          value: "8000"
+        - name: JAVA_INITIAL_MEMORY
+          value: "<vars.archiva.java.initialMemory>"
+        - name: JAVA_MAX_MEMORY
+          value: "<vars.archiva.java.maxMemory>"
+        ports:
+        - containerPort: 8000
+          name: "http"
+        <resourcesGroup(parent, vars, vars.archiva)>
+        volumeMounts:
+        - mountPath: "/var/www/html"
+          name: "data"
+          subPath: "archiva_html"
+        - mountPath: "/data"
+          name: "data"
+          subPath: "archiva_data"
+        livenessProbe:
+          tcpSocket:
+            port: "http"
+          initialDelaySeconds: <vars.archiva.initialDelaySeconds>
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: "http"
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 10
+      - image: <vars.nginx.image.name>:<vars.nginx.image.version>
+        name: nginx
+        ports:
+        - containerPort: 8080
+          name: "http"
+        <nginxReadinessProbe(parent, vars, vars.archiva)>
+        <resourcesGroup(parent, vars, vars.nginx)>
+        volumeMounts:
+        - mountPath: "/var/www/html"
+          name: "data"
+          subPath: "archiva_html"
+        - mountPath: "/nginx-in"
+          name: "nginx-config"
+      restartPolicy: Always
+      volumes:
+      - name: "data"
+        persistentVolumeClaim:
+          claimName: "anrisoftware-com-data"
+      - name: "nginx-config"
+        configMap:
+          name: "archiva-nginx-<vars.archiva.revision>"
+      <affinitiesGroup(parent, vars, vars.archiva.affinity)>
+      <tolerationMasterGroup(parent, vars, vars.archiva.allowOnMaster)>
+      <tolerationsGroup(parent, vars, vars.archiva.tolerations, vars.archiva.allowOnMaster)>
+
+---
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: archiva-db-setup
+  namespace: anrisoftware-com
+  labels:
+    app: archiva
+    tier: frontend
+    group: anrisoftware-com
+spec:
+  template:
+    metadata:
+      name: archiva-db-setup
+    spec:
+      containers:
+      - image: <vars.postgres.image.name>:<vars.postgres.image.version>
+        name: archiva-db-setup
+        env:
+        - name: POSTGRESQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: archiva-db-<vars.archiva.revision>
+              key: user
+        - name: POSTGRESQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: archiva-db-<vars.archiva.revision>
+              key: password
+        - name: POSTGRESQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: archiva-db-<vars.archiva.revision>
+              key: database
+        - name: POSTGRESQL_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: archiva-db-<vars.archiva.revision>
+              key: admin_password
+        - name: PGHOST
+          value: "postgres"
+        - name: PGPORT
+          value: "5432"
+        - name: PGUSER
+          value: "postgres"
+        command:
+        - /bin/sh
+        - -i
+        - -c
+        - >
+          while ! PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql "postgresql://postgres@postgres" -c "SELECT 1;"; do sleep 3; done;
+          PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} createuser $POSTGRESQL_USER ;
+          PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} createdb --owner=$POSTGRESQL_USER $POSTGRESQL_DATABASE ;
+          PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql -c "ALTER USER \"${POSTGRESQL_USER}\" WITH ENCRYPTED PASSWORD '${POSTGRESQL_PASSWORD}';";
+          PGPASSWORD=${POSTGRESQL_PASSWORD} psql "postgresql://${POSTGRESQL_USER}@postgres" -c "CREATE SCHEMA anrisprojects;"
+      restartPolicy: Never
+  backoffLimit: 4
+
+---
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: rsync-archiva
+  namespace: anrisoftware-com
+  labels:
+    app: rsync-archiva
+    tier: backup
+    group: anrisoftware-com
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: rsync-archiva
+      tier: backup
+      group: anrisoftware-com
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rsync-archiva
+        tier: backup
+        group: anrisoftware-com
+    spec:
+      containers:
+      - image: <vars.rsync.image.name>:<vars.rsync.image.version>
+        name: rsync-archiva
+        env:
+        - name: RSYNC_AUTHORIZED_KEY
+          valueFrom:
+            secretKeyRef:
+              name: rsync-ssh-<vars.rsync.ssh.revision>
+              key: auth-key
+        - name: USER
+          value: "root"
+        ports:
+        - containerPort: 2222
+          name: ssh
+        readinessProbe:
+          exec:
+            command:
+            - /readiness.sh
+            - /data/Rakefile
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+        <resourcesGroup(parent, vars, vars.rsync)>
+        volumeMounts:
+        - mountPath: "/data"
+          name: data
+          subPath: archiva_html
+        - mountPath: "/bundle"
+          name: data
+          subPath: archiva_bundle
+      restartPolicy: Always
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: anrisoftware-com-data
+      <affinitiesGroup(parent, vars, vars.archiva.affinity)>
+      <tolerationMasterGroup(parent, vars, vars.archiva.allowOnMaster)>
+      <tolerationsGroup(parent, vars, vars.archiva.tolerations, vars.archiva.allowOnMaster)>
+
+---
+
+>>
