@@ -6,9 +6,10 @@
  * vars.archiva.image.version
  * vars.archiva.revision
  * vars.archiva.initialDelaySeconds
- * vars.archiva.nginx.hosts[]
  * vars.archiva.java.initialMemory
  * vars.archiva.java.maxMemory
+ * vars.archiva.nginx.hosts[]
+ * vars.archiva.nginx.clientMaxBodySize
  * vars.nginx.image.name
  * vars.nginx.image.version
  * vars.nginx.workerProcesses
@@ -47,6 +48,8 @@ import "robobeerun-templates/_nginx_config.stg"
 import "robobeerun-templates/_nginx_probe.stg"
 import "robobeerun-templates/_tolerations.stg"
 import "robobeerun-templates/_resources.stg"
+import "robobeerun-templates/_cert_config.stg"
+import "robobeerun-templates/_ingress_config.stg"
 
 /*
  *
@@ -192,65 +195,6 @@ spec:
 
 ---
 
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: archiva-db-setup
-  namespace: anrisoftware-com
-  labels:
-    app: archiva
-    tier: frontend
-    group: anrisoftware-com
-spec:
-  template:
-    metadata:
-      name: archiva-db-setup
-    spec:
-      containers:
-      - image: <vars.postgres.image.name>:<vars.postgres.image.version>
-        name: archiva-db-setup
-        env:
-        - name: POSTGRESQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: archiva-db-<vars.archiva.revision>
-              key: user
-        - name: POSTGRESQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: archiva-db-<vars.archiva.revision>
-              key: password
-        - name: POSTGRESQL_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: archiva-db-<vars.archiva.revision>
-              key: database
-        - name: POSTGRESQL_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: archiva-db-<vars.archiva.revision>
-              key: admin_password
-        - name: PGHOST
-          value: "postgres"
-        - name: PGPORT
-          value: "5432"
-        - name: PGUSER
-          value: "postgres"
-        command:
-        - /bin/sh
-        - -i
-        - -c
-        - >
-          while ! PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql "postgresql://postgres@postgres" -c "SELECT 1;"; do sleep 3; done;
-          PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} createuser $POSTGRESQL_USER ;
-          PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} createdb --owner=$POSTGRESQL_USER $POSTGRESQL_DATABASE ;
-          PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql -c "ALTER USER \"${POSTGRESQL_USER}\" WITH ENCRYPTED PASSWORD '${POSTGRESQL_PASSWORD}';";
-          PGPASSWORD=${POSTGRESQL_PASSWORD} psql "postgresql://${POSTGRESQL_USER}@postgres" -c "CREATE SCHEMA anrisprojects;"
-      restartPolicy: Never
-  backoffLimit: 4
-
----
-
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -313,6 +257,38 @@ spec:
       <affinitiesGroup(parent, vars, vars.archiva.affinity)>
       <tolerationMasterGroup(parent, vars, vars.archiva.allowOnMaster)>
       <tolerationsGroup(parent, vars, vars.archiva.tolerations, vars.archiva.allowOnMaster)>
+
+---
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: archiva-anrisoftware-com
+  namespace: anrisoftware-com
+  labels:
+    app: archiva
+    tier: frontend
+    deployment: archiva
+  annotations:
+    <ingressDefaultAnnotations(parent, vars, vars.nginx)>
+spec:
+  <ingressDefaultSpec(parent, vars, vars.archiva.nginx, "archiva-anrisoftware-com")>
+
+---
+
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: archiva-anrisoftware-com
+  namespace: anrisoftware-com
+spec:
+  <certDefaultSpecProd(parent, vars, vars.archiva.nginx, "archiva-anrisoftware-com")>
+
+---
+
+<ingressService(parent, vars, vars.archiva.nginx, "anrisoftware-com", "archiva", "archiva-anrisoftware-com")>
 
 ---
 
