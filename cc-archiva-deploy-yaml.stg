@@ -7,14 +7,8 @@
  * vars.archiva.revision
  * vars.archiva.initialDelaySeconds
  * vars.archiva.nginx.hosts[]
- * vars.archiva.puma.minThreads
- * vars.archiva.puma.maxThreads
- * vars.archiva.puma.workers
- * vars.archiva.puma.timeout
- * vars.archiva.postgres.user
- * vars.archiva.postgres.password
- * vars.archiva.postgres.database
- * vars.archiva.postgres.schema
+ * vars.archiva.java.initialMemory
+ * vars.archiva.java.maxMemory
  * vars.nginx.image.name
  * vars.nginx.image.version
  * vars.nginx.workerProcesses
