@@ -314,9 +314,9 @@ spec:
       - name: "pgbouncer-config"
         configMap:
           name: "gitea-pgbouncer-<vars.gitea.revision>"
-<affinitiesGroup(parent, vars, vars.gitea.affinity)>
-<tolerationMasterGroup(parent, vars, vars.gitea.allowOnMaster)>
-<tolerationsGroup(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.gitea.affinity)>
+      <tolerationMasterGroup(parent, vars, vars.gitea.allowOnMaster)>
+      <tolerationsGroup(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
 
 ---
 
@@ -439,9 +439,9 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-<affinitiesGroup(parent, vars, vars.gitea.affinity)>
-<tolerationMasterGroup(parent, vars, vars.gitea.allowOnMaster)>
-<tolerationsGroup(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.gitea.affinity)>
+      <tolerationMasterGroup(parent, vars, vars.gitea.allowOnMaster)>
+      <tolerationsGroup(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>
 
 ---
 

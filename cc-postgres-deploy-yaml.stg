@@ -148,9 +148,9 @@ spec:
       - name: pgdata
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-<affinitiesGroup(parent, vars, vars.postgres.affinity)>
-<tolerationMasterGroup(parent, vars, vars.postgres.allowOnMaster)>
-<tolerationsGroup(parent, vars, vars.postgres.tolerations, vars.postgres.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.postgres.affinity)>
+      <tolerationMasterGroup(parent, vars, vars.postgres.allowOnMaster)>
+      <tolerationsGroup(parent, vars, vars.postgres.tolerations, vars.postgres.allowOnMaster)>
 
 ---
 
@@ -212,9 +212,9 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-<affinitiesGroup(parent, vars, vars.postgres.affinity)>
-<tolerationMasterGroup(parent, vars, vars.postgres.allowOnMaster)>
-<tolerationsGroup(parent, vars, vars.postgres.tolerations, vars.postgres.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.postgres.affinity)>
+      <tolerationMasterGroup(parent, vars, vars.postgres.allowOnMaster)>
+      <tolerationsGroup(parent, vars, vars.postgres.tolerations, vars.postgres.allowOnMaster)>
 
 ---
 

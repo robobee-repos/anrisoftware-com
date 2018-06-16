@@ -345,9 +345,9 @@ spec:
       - name: "pgbouncer-config"
         configMap:
           name: "redmine-pgbouncer-<vars.redmine.revision>"
-<affinitiesGroup(parent, vars, vars.redmine.affinity)>
-<tolerationMasterGroup(parent, vars, vars.redmine.allowOnMaster)>
-<tolerationsGroup(parent, vars, vars.redmine.tolerations, vars.redmine.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.redmine.affinity)>
+      <tolerationMasterGroup(parent, vars, vars.redmine.allowOnMaster)>
+      <tolerationsGroup(parent, vars, vars.redmine.tolerations, vars.redmine.allowOnMaster)>
 
 ---
 
@@ -469,9 +469,9 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
-<affinitiesGroup(parent, vars, vars.redmine.affinity)>
-<tolerationMasterGroup(parent, vars, vars.redmine.allowOnMaster)>
-<tolerationsGroup(parent, vars, vars.redmine.tolerations, vars.redmine.allowOnMaster)>
+      <affinitiesGroup(parent, vars, vars.redmine.affinity)>
+      <tolerationMasterGroup(parent, vars, vars.redmine.allowOnMaster)>
+      <tolerationsGroup(parent, vars, vars.redmine.tolerations, vars.redmine.allowOnMaster)>
 
 ---
 
