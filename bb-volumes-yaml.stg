@@ -1,8 +1,8 @@
 /*
  * Mandatory:
  *
- * vars.volumes.class
- * vars.volumes.storage
+ * vars.volume.class
+ * vars.volume.storage
  *
  */
 
@@ -24,6 +24,6 @@ spec:
   - ReadWriteMany
   resources:
     requests:
-      storage: <vars.volumes.storage>
+      storage: <vars.volume.storage>
 
 >>
