@@ -238,7 +238,7 @@ spec:
           exec:
             command:
             - /readiness.sh
-            - /data/Rakefile
+            - /data/LICENSE
           initialDelaySeconds: 5
           timeoutSeconds: 1
         <resourcesGroup(parent, vars, vars.rsync)>
