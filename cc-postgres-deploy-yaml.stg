@@ -147,7 +147,7 @@ spec:
       volumes:
       - name: pgdata
         persistentVolumeClaim:
-          claimName: anrisoftware-com-data
+          claimName: anrisoftware-com-data-1
       <affinitiesGroup(parent, vars, vars.postgres.affinity)>
       <tolerationMasterGroup(parent, vars, vars.postgres.allowOnMaster)>
       <tolerationsGroup(parent, vars, vars.postgres.tolerations, vars.postgres.allowOnMaster)>
@@ -213,9 +213,6 @@ spec:
       restartPolicy: Always
       volumes:
       - name: data
-        persistentVolumeClaim:
-          claimName: anrisoftware-com-data
-      - name: data-1
         persistentVolumeClaim:
           claimName: anrisoftware-com-data-1
       <affinitiesGroup(parent, vars, vars.postgres.affinity)>
