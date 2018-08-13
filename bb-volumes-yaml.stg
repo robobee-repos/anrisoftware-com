@@ -1,7 +1,8 @@
 /*
  * Mandatory:
  *
- * vars.volumes.data.storage
+ * vars.volumes.class
+ * vars.volumes.storage
  *
  */
 
@@ -12,15 +13,17 @@ bb-volumes-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: anrisoftware-com-data
+  name: anrisoftware-com-data-1
   namespace: anrisoftware-com
   labels:
     group: anrisoftware-com
+  annotations:
+    volume.beta.kubernetes.io/storage-class: <vars.volume.class>
 spec:
   accessModes:
   - ReadWriteMany
   resources:
     requests:
-      storage: <vars.volumes.data.storage>
+      storage: <vars.volumes.storage>
 
 >>
