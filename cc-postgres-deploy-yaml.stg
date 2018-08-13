@@ -207,9 +207,6 @@ spec:
         - mountPath: "/data"
           subPath: "pgdata"
           name: data
-        - mountPath: "/data-1"
-          subPath: "pgdata"
-          name: data-1
       restartPolicy: Always
       volumes:
       - name: data
