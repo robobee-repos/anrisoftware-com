@@ -464,11 +464,20 @@ spec:
         - mountPath: "/bundle"
           name: data
           subPath: redmine_bundle
+        - mountPath: "/data-1"
+          name: data-1
+          subPath: redmine_html
+        - mountPath: "/bundle-1"
+          name: data-1
+          subPath: redmine_bundle
       restartPolicy: Always
       volumes:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
+      - name: data-1
+        persistentVolumeClaim:
+          claimName: anrisoftware-com-data-1
       <affinitiesGroup(parent, vars, vars.redmine.affinity)>
       <tolerationMasterGroup(parent, vars, vars.redmine.allowOnMaster)>
       <tolerationsGroup(parent, vars, vars.redmine.tolerations, vars.redmine.allowOnMaster)>

@@ -207,11 +207,17 @@ spec:
         - mountPath: "/data"
           subPath: "pgdata"
           name: data
+        - mountPath: "/data-1"
+          subPath: "pgdata"
+          name: data-1
       restartPolicy: Always
       volumes:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
+      - name: data-1
+        persistentVolumeClaim:
+          claimName: anrisoftware-com-data-1
       <affinitiesGroup(parent, vars, vars.postgres.affinity)>
       <tolerationMasterGroup(parent, vars, vars.postgres.allowOnMaster)>
       <tolerationsGroup(parent, vars, vars.postgres.tolerations, vars.postgres.allowOnMaster)>

@@ -434,11 +434,20 @@ spec:
         - mountPath: "/html"
           name: data
           subPath: gitea_html
+        - mountPath: "/data-1"
+          name: data-1
+          subPath: gitea_data
+        - mountPath: "/html-1"
+          name: data-1
+          subPath: gitea_html
       restartPolicy: Always
       volumes:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
+      - name: data-1
+        persistentVolumeClaim:
+          claimName: anrisoftware-com-data-1
       <affinitiesGroup(parent, vars, vars.gitea.affinity)>
       <tolerationMasterGroup(parent, vars, vars.gitea.allowOnMaster)>
       <tolerationsGroup(parent, vars, vars.gitea.tolerations, vars.gitea.allowOnMaster)>

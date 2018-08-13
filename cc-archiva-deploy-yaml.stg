@@ -249,11 +249,20 @@ spec:
         - mountPath: "/bundle"
           name: data
           subPath: archiva_bundle
+        - mountPath: "/data-1"
+          name: data-1
+          subPath: archiva_html
+        - mountPath: "/bundle-1"
+          name: data-1
+          subPath: archiva_bundle
       restartPolicy: Always
       volumes:
       - name: data
         persistentVolumeClaim:
           claimName: anrisoftware-com-data
+      - name: data-1
+        persistentVolumeClaim:
+          claimName: anrisoftware-com-data-1
       <affinitiesGroup(parent, vars, vars.archiva.affinity)>
       <tolerationMasterGroup(parent, vars, vars.archiva.allowOnMaster)>
       <tolerationsGroup(parent, vars, vars.archiva.tolerations, vars.archiva.allowOnMaster)>
