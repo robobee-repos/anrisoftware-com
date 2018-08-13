@@ -5,7 +5,7 @@
  * vars.redmine.image.version
  * vars.redmine.revision
  * vars.redmine.initialDelaySeconds
- * vars.redmine.nginx.hosts[]
+ * vars.redmine.hosts[]
  * vars.redmine.puma.minThreads
  * vars.redmine.puma.maxThreads
  * vars.redmine.puma.workers
@@ -155,11 +155,11 @@ data:
         upstream backend {
             server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.nginx.readTimeout>;
         }
-        <nginxVirtualHosts(parent, vars, vars.redmine.nginx.hosts)>
+        <nginxVirtualHosts(parent, vars, vars.redmine.hosts)>
         server {
             listen 8080;
             listen [::]:8080;
-            server_name <first(vars.redmine.nginx.hosts)>;
+            server_name <first(vars.redmine.hosts)>;
             root /var/www/html/public;
             index index.php;
             <nginxLocationFavicon(parent, vars)>

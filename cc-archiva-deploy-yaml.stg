@@ -8,7 +8,7 @@
  * vars.archiva.initialDelaySeconds
  * vars.archiva.java.initialMemory
  * vars.archiva.java.maxMemory
- * vars.archiva.nginx.hosts[]
+ * vars.archiva.hosts[]
  * vars.archiva.nginx.clientMaxBodySize
  * vars.nginx.image.name
  * vars.nginx.image.version
@@ -75,11 +75,11 @@ data:
         upstream backend {
             server 127.0.0.1:8000 max_fails=3 fail_timeout=<vars.nginx.readTimeout>;
         }
-        <nginxVirtualHosts(parent, vars, vars.archiva.nginx.hosts)>
+        <nginxVirtualHosts(parent, vars, vars.archiva.hosts)>
         server {
             listen 8080;
             listen [::]:8080;
-            server_name <first(vars.archiva.nginx.hosts)>;
+            server_name <first(vars.archiva.hosts)>;
             root /var/www/html/apps/archiva;
             index index.php;
             <nginxLocationFavicon(parent, vars)>
@@ -260,8 +260,6 @@ spec:
 
 ---
 
----
-
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -272,9 +270,13 @@ metadata:
     tier: frontend
     deployment: archiva
   annotations:
-    <ingressDefaultAnnotations(parent, vars, vars.nginx)>
+    <ingressDefaultAnnotations(vars.nginx)>
 spec:
-  <ingressDefaultSpec(parent, vars, vars.archiva.nginx, "archiva-anrisoftware-com")>
+  <ingressDefaultSpec(vars.archiva, "archiva-anrisoftware-com")>
+
+---
+
+<ingressService(vars.archiva, "archiva-anrisoftware-com", "archiva", "anrisoftware-com")>
 
 ---
 
@@ -284,11 +286,7 @@ metadata:
   name: archiva-anrisoftware-com
   namespace: anrisoftware-com
 spec:
-  <certDefaultSpecProd(parent, vars, vars.archiva.nginx, "archiva-anrisoftware-com")>
-
----
-
-<ingressService(parent, vars, vars.archiva.nginx, "anrisoftware-com", "archiva", "archiva-anrisoftware-com")>
+  <certDefaultSpecProd(vars.archiva, "archiva-anrisoftware-com")>
 
 ---
 
