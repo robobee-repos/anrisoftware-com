@@ -4,7 +4,7 @@
  * vars.gitea.image.name
  * vars.gitea.image.version
  * vars.gitea.revision
- * vars.gitea.nginx.hosts[]
+ * vars.gitea.hosts[]
  * vars.gitea.postgres.user
  * vars.gitea.postgres.password
  * vars.gitea.postgres.database
@@ -92,11 +92,11 @@ data:
         upstream backend {
             server 127.0.0.1:3000 max_fails=3 fail_timeout=<vars.nginx.readTimeout>;
         }
-        <nginxVirtualHosts(parent, vars, vars.gitea.nginx.hosts)>
+        <nginxVirtualHosts(parent, vars, vars.gitea.hosts)>
         server {
             listen 8080 default_server;
             listen [::]:8080 default_server;
-            server_name <first(vars.gitea.nginx.hosts)>;
+            server_name <first(vars.gitea.hosts)>;
             root /var/www/html;
             <nginxLocationFavicon(parent, vars)>
             <nginxLocationRobots(parent, vars)>
