@@ -400,7 +400,7 @@ spec:
         - -i
         - -c
         - >
-          while ! PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql "postgresql://postgres@postgres" -c "SELECT 1;"; do sleep 3; done;
+          while ! PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql "postgresql://testdb@postgres" -c "SELECT 1;"; do sleep 3; done;
           PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} createuser $POSTGRESQL_USER ;
           PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} createdb --owner=$POSTGRESQL_USER $POSTGRESQL_DATABASE ;
           PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql -c "ALTER USER \"${POSTGRESQL_USER}\" WITH ENCRYPTED PASSWORD '${POSTGRESQL_PASSWORD}';";
