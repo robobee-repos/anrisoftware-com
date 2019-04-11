@@ -14,15 +14,24 @@
  * vars.redmine.postgres.password
  * vars.redmine.postgres.database
  * vars.redmine.postgres.schema
+ * 
+ * vars.postgres.host
+ *     The PostgreSQL host, for example 'postgres-postgresql.robobeerun-com-postgres.svc'.
+ * vars.postgres.port
+ *     The PostgreSQL port, for example '5432'.
  * vars.postgres.password
+ *     The PostgreSQL admin password.
+ * 
  * vars.nginx.image.name
  * vars.nginx.image.version
  * vars.nginx.workerProcesses
  * vars.nginx.workerConnections
  * vars.nginx.clientMaxBodySize
  * vars.nginx.readTimeout
+ * 
  * vars.pgbouncer.image.name
  * vars.pgbouncer.image.version
+ * 
  * vars.rsync.image.name
  * vars.rsync.image.version
  * vars.rsync.ssh.revision
@@ -40,14 +49,17 @@
  * vars.redmine.tolerations[].effect
  * vars.redmine.tolerations[].key
  * vars.redmine.tolerations[].value
+ * 
  * vars.nginx.limits.cpu
  * vars.nginx.limits.memory
  * vars.nginx.requests.cpu
  * vars.nginx.requests.memory
+ * 
  * vars.pgbouncer.limits.cpu
  * vars.pgbouncer.limits.memory
  * vars.pgbouncer.requests.cpu
  * vars.pgbouncer.requests.memory
+ * 
  * vars.rsync.limits.cpu
  * vars.rsync.limits.memory
  * vars.rsync.requests.cpu
@@ -124,7 +136,7 @@ metadata:
 data:
   pgbouncer.ini: |
     [databases]
-    <vars.redmine.postgres.database> = host=db port=5432 dbname=<vars.redmine.postgres.database>
+    <vars.redmine.postgres.database> = host=<vars.postgres.host> port=<vars.postgres.port> dbname=<vars.redmine.postgres.database>
     [pgbouncer]
     listen_port = 5432
     listen_addr = 0.0.0.0
@@ -397,7 +409,6 @@ spec:
           value: "postgres"
         command:
         - /bin/sh
-        - -i
         - -c
         - >
           while ! PGPASSWORD=${POSTGRESQL_ADMIN_PASSWORD} psql "postgresql://testdb@postgres" -c "SELECT 1;"; do sleep 3; done;
