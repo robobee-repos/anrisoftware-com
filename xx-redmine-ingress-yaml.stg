@@ -46,7 +46,7 @@ metadata:
   name: redmine-ingress
   namespace: project-anrisoftware-com
 spec:
-  <certDefaultSpec("redmine-ingress", vars.redmine.hosts, vars.redmine.issuer)>
+  <certDefaultSpec("redmine-ingress-tls", vars.redmine.hosts, vars.redmine.issuer)>
 
 ---
 
