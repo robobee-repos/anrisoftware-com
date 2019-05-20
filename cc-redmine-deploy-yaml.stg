@@ -254,17 +254,17 @@ spec:
         - name: REDMINE_DB_USERNAME
           valueFrom:
             secretKeyRef:
-              name: db-<vars.redmine.revision>
+              name: db-<vars.db.revision>
               key: user
         - name: REDMINE_DB_DATABASE
           valueFrom:
             secretKeyRef:
-              name: db-<vars.redmine.revision>
+              name: db-<vars.db.revision>
               key: database
         - name: REDMINE_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: db-<vars.redmine.revision>
+              name: db-<vars.db.revision>
               key: password
         - name: REDMINE_PLUGINS_MIGRATE
           value: "true"
