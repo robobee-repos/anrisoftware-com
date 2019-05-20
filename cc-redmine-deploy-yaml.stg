@@ -99,7 +99,7 @@ cc-redmine-deploy-yaml(parent, vars) ::= <<
 apiVersion: v1
 kind: Secret
 metadata:
-  name: db-<vars.redmine.revision>
+  name: db-<vars.db.revision>
   namespace: project-anrisoftware-com
   labels:
     tier: backend
@@ -304,17 +304,17 @@ spec:
         - name: PGUSER
           valueFrom:
             secretKeyRef:
-              name: db-<vars.keycloak.revision>
+              name: db-<vars.db.revision>
               key: user
         - name: PGPASSWORD
           valueFrom:
             secretKeyRef:
-              name: db-<vars.keycloak.revision>
+              name: db-<vars.db.revision>
               key: password
         - name: PGDATABASE
           valueFrom:
             secretKeyRef:
-              name: db-<vars.keycloak.revision>
+              name: db-<vars.db.revision>
               key: database
         - name: PGHOST
           value: "127.0.0.1"
