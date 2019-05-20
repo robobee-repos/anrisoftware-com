@@ -327,7 +327,7 @@ spec:
       volumes:
       - name: "data"
         persistentVolumeClaim:
-          claimName: "anrisoftware-com-data-1"
+          claimName: "anrisoftware-com-data-0"
       - name: "redmine-config"
         configMap:
           name: "redmine-<vars.redmine.revision>"
