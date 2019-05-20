@@ -32,7 +32,7 @@ metadata:
   annotations:
     <ingressDefaultAnnotations(vars.nginx)>
 spec:
-  <ingressDefaultSpec("redmine-ingress", vars.redmine)>
+  <ingressDefaultSpec("redmine-ingress", vars.redmine.hosts)>
 
 ---
 
