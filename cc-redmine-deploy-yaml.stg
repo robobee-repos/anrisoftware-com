@@ -12,6 +12,9 @@
  * 
  * vars.db.image.name
  * vars.db.image.version
+ * vars.db.revision
+ * vars.db.host
+ * vars.db.port
  * vars.db.user
  * vars.db.password
  * vars.db.database
@@ -84,6 +87,7 @@ import "robobeerun-templates/_postgres_probe.stg"
 import "robobeerun-templates/_tolerations.stg"
 import "robobeerun-templates/_resources.stg"
 import "robobeerun-templates/http_probe.stg"
+import "robobeerun-templates/postgresql_init.stg"
 
 /*
  *
@@ -229,6 +233,8 @@ spec:
         app: redmine
         tier: frontend
     spec:
+      initContainers:
+      <postgresInitDbGroup(vars.db)>
       containers:
       - image: <vars.redmine.image.name>:<vars.redmine.image.version>
         name: redmine
