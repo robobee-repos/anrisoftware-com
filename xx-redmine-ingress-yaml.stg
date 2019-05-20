@@ -2,7 +2,14 @@
  * Mandatory:
  *
  * vars.redmine.hosts[]
+ * vars.redmine.issuer
+ * 
+ * Optional:
+ * 
+ * vars.redmine.port
+ *     Defaults to 8080.
  * vars.nginx.clientMaxBodySize
+ *     Defaults to "".
  *
  */
 
@@ -18,28 +25,28 @@ xx-redmine-ingress-yaml(parent, vars) ::= <<
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: redmine-anrisoftware-com
+  name: redmine-ingress
   namespace: project-anrisoftware-com
   labels:
     tier: frontend
   annotations:
     <ingressDefaultAnnotations(vars.nginx)>
 spec:
-  <ingressDefaultSpec(vars.redmine, "redmine-anrisoftware-com")>
+  <ingressDefaultSpec("redmine-ingress", vars.redmine)>
 
 ---
 
-<ingressService(vars.redmine, "redmine-anrisoftware-com", "redmine", "anrisoftware-com")>
+<ingressService("redmine-ingress", "redmine", "project-anrisoftware-com", vars.redmine)>
 
 ---
 
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: redmine-anrisoftware-com
+  name: redmine-ingress
   namespace: project-anrisoftware-com
 spec:
-  <certDefaultSpecProd(vars.redmine, "redmine-anrisoftware-com")>
+  <certDefaultSpec("redmine-ingress", vars.redmine.hosts, vars.redmine.issuer)>
 
 ---
 
